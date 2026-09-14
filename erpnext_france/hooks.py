@@ -451,6 +451,7 @@ override_whitelisted_methods = {
 	"erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice": "erpnext_france.controllers.sales_order.make_sales_invoice_with_payment_terms",
 	"erpnext.selling.doctype.customer.customer.make_quotation": "erpnext_france.controllers.party.make_quotation_with_payment_terms",
 	"erpnext.accounts.party.get_due_date": "erpnext_france.controllers.party.get_due_date",
+    "erpnext.accounts.doctype.account.chart_of_accounts.chart_of_accounts.get_charts_for_country": "erpnext_france.erpnext_france.overrides.doctype.chart_of_accounts.get_charts_for_country_fr",
 }
 
 # Regional Overrides

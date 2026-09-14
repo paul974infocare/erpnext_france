@@ -104,7 +104,7 @@ def default_accounts_mapping(accounts):
 		"default_receivable_account": 4111,
 		"default_payable_account": 4011,
 		"asset_received_but_not_billed": 4084,
-		"default_expense_account": 6071,
+		"default_expense_account": 607,
 		"default_income_account": 7071,
 		"default_deferred_revenue_account": 487,
 		"default_deferred_expense_account": 486,

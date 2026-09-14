@@ -9,7 +9,14 @@ from erpnext.accounts.doctype.account.chart_of_accounts.chart_of_accounts import
 )
 
 
-SUPPORTED_COUNTRIES = ("France", "Réunion")
+SUPPORTED_COUNTRIES = (
+    "France",
+    "Guadeloupe",
+    "Martinique",
+    "Guyane",
+    "Réunion",
+    "Mayotte",
+)
 
 
 def _get_chart_path():
@@ -49,12 +56,7 @@ def get_charts_for_country_fr(country, with_standard=False):
     if country not in SUPPORTED_COUNTRIES:
         return erpnext_get_charts_for_country(country, with_standard)
 
-    charts = _get_local_charts()
-
-    if len(charts) != 1 or with_standard:
-        charts += ["Standard", "Standard with Numbers"]
-
-    return charts
+    return _get_local_charts()
 
 
 @frappe.whitelist()

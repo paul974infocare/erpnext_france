@@ -65,36 +65,46 @@ def setup_wizard_complete(args, action=None):
 
 
 def setup_company_default(company, action):
-	if company.country not in ("France", "Réunion"):
-		return
+    if company.country not in (
+        "France",
+        "Guadeloupe",
+        "Martinique",
+        "Guyane",
+        "Réunion",
+        "Mayotte",
+    ):
+        return
 
-	if not frappe.db.sql(
-		"""select name
+    if not frappe.db.sql(
+        """select name
            from tabAccount
            where company = %s
              and docstatus < 2 limit 1""",
-		company.company_name,
-	):
-		company.name = company.company_name
-		company.create_default_accounts()
+        company.company_name,
+    ):
+        company.name = company.company_name
+        company.create_default_accounts()
 
-	accounts = frappe.db.get_all(
-		"Account",
-		filters={"disabled": 0, "is_group": 0, "company": company.name},
-		fields=["name", "account_number"],
-	)
+    accounts = frappe.db.get_all(
+        "Account",
+        filters={"disabled": 0, "is_group": 0, "company": company.name},
+        fields=["name", "account_number"],
+    )
 
-	account_map = default_accounts_mapping(accounts)
-	for account in account_map:
-		company.db_set(account, account_map[account])
+    account_map = default_accounts_mapping(accounts)
+    for account in account_map:
+        company.db_set(account, account_map[account])
 
-	company.db_set("enable_perpetual_inventory", 0)
-	company.db_set("payment_terms", "30 jours")
-	company.db_set("default_payment_terms_template_before_invoice", "30% à la commande, 70% avant expédition")
-	company.create_default_warehouses()
-	set_default_accounting_journal(company.company_name, company.abbr)
+    company.db_set("enable_perpetual_inventory", 0)
+    company.db_set("payment_terms", "30 jours")
+    company.db_set(
+        "default_payment_terms_template_before_invoice",
+        "30% à la commande, 70% avant expédition",
+    )
+    company.create_default_warehouses()
+    set_default_accounting_journal(company.company_name, company.abbr)
 
-	frappe.local.flags.ignore_chart_of_accounts = True
+    frappe.local.flags.ignore_chart_of_accounts = True
 
 
 def default_accounts_mapping(accounts):

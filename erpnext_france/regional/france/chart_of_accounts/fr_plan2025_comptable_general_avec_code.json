@@ -1,8 +1,8 @@
 {
 	"country_code": "fr",
-	"name": "France - Plan Comptable General 2025 avec code",
+	"name": "Plan Comptable G\u00e9n\u00e9ral",
 	"tree": {
-		"1-Comptes de capitaux": {
+		"1-Comptes de capitaux (FONDS PROPRES)": {
 			"root_type": "Equity",
 			"10-Capital et r\u00e9serves": {
 				"101-Capital": {
@@ -40,7 +40,7 @@
 					"Primes de conversion d'obligations en actions": {
 						"account_number": "1044"
 					},
-					"Bons de souscription d'actions": {
+					"Bons de souscription de titres en capital": {
 						"account_number": "1045"
 					}
 				},
@@ -69,9 +69,6 @@
 				},
 				"Compte de l'exploitant": {
 					"account_number": "108"
-				},
-				"Actionnaires : capital souscrit - non appel\u00e9": {
-					"account_number": "109"
 				}
 			},
 			"11-Report \u00e0 nouveau": {
@@ -91,7 +88,6 @@
 				"R\u00e9sultat de l'exercice - perte": {
 					"account_number": "129"
 				}
-
 			},
 			"13-Subventions d'investissement": {
 				"Subventions d'investissement octroy\u00e9es": {
@@ -112,6 +108,27 @@
 					"account_number": "148"
 				}
 			},
+			"16-Emprunts et dettes assimil\u00e9es, fonds non remboursables et avances conditionn\u00e9es": {
+				"167-Fonds non remboursables et avances conditionn\u00e9es": {
+					"1671-Fonds non remboursables montant principal": {
+						"Titres participatifs montant principal": {
+							"account_number": "16711"
+						},
+						"Autres fonds non remboursables montant principal": {
+							"account_number": "16712"
+						}
+					},
+					"Avances conditionn\u00e9es montant principal": {
+						"account_number": "1673"
+					},
+					"Avances conditionn\u00e9es int\u00e9r\u00eats courus": {
+						"account_number": "1674"
+					}
+				}
+			}
+		},
+		"1-Comptes de capitaux (PROVISIONS ET DETTES)": {
+			"root_type": "Liability",
 			"15-Provisions": {
 				"151-Provisions pour risques": {
 					"Provisions pour litiges": {
@@ -157,21 +174,21 @@
 					}
 				}
 			},
-			"16-Emprunts et dettes assimil\u00e9es": {
-				"161-Emprunts obligataires convertibles": {
+			"16-Emprunts et dettes assimil\u00e9es, fonds non remboursables et avances conditionn\u00e9es": {
+				"161-Emprunts obligataires convertibles si non-inscrits dans le compte 167": {
 					"Int\u00e9r\u00eats courus sur emprunts obligataires convertibles": {
 						"account_number": "1618"
 					}
 				},
-				"Obligations repr\u00e9sentatives de passifs nets remis en fiducie": {
+				"Obligations repr\u00e9sentatives de passifs nets remis en fiducie si non-inscrites dans le compte 167": {
 					"account_number": "162"
 				},
-				"163-Autres emprunts obligataires": {
+				"163-Autres emprunts obligataires si non-inscrits dans le compte 167": {
 					"Int\u00e9r\u00eats courus sur autres emprunts obligataires": {
 						"account_number": "1638"
 					}
 				},
-				"164-Emprunts aupr\u00e8s des \u00e9tablissements de cr\u00e9dit": {
+				"164-Emprunts aupr\u00e8s des \u00e9tablissements de cr\u00e9dit si non-inscrits dans le compte 167": {
 					"Int\u00e9r\u00eats courus sur emprunts aupr\u00e8s des \u00e9tablissements de cr\u00e9dit": {
 						"account_number": "1648"
 					}
@@ -198,26 +215,12 @@
 						"account_number": "1668"
 					}
 				},
-				"167-Emprunts et dettes assortis de conditions particuli\u00e8res": {
-					"1671-\u00c9missions de titres participatifs": {
-						"Int\u00e9r\u00eats courus sur titres participatifs": {
-							"account_number": "16718"
-						}
-					},
-					"1674-Avances conditionn\u00e9es de l'\u00c9tat": {
-						"Int\u00e9r\u00eats courus sur avances conditionn\u00e9es": {
-							"account_number": "16748"
-						}
-					},
-					"1675-Emprunts participatifs": {
-						"Int\u00e9r\u00eats courus sur emprunts participatifs": {
-							"account_number": "16758"
-						}
-					}
-				},
 				"168-Autres emprunts et dettes assimil\u00e9es": {
 					"Autres emprunts": {
 						"account_number": "1681"
+					},
+					"Emprunts participatifs": {
+						"account_number": "1682"
 					},
 					"Rentes viag\u00e8res capitalis\u00e9es": {
 						"account_number": "1685"
@@ -228,9 +231,6 @@
 					"Int\u00e9r\u00eats courus sur autres emprunts et dettes assimil\u00e9es": {
 						"account_number": "1688"
 					}
-				},
-				"Primes de remboursement des emprunts": {
-					"account_number": "169"
 				}
 			},
 			"17-Dettes rattach\u00e9es \u00e0 des participations": {
@@ -242,6 +242,19 @@
 				},
 				"Dettes rattach\u00e9es \u00e0 des soci\u00e9t\u00e9s en participation": {
 					"account_number": "178"
+				}
+			}
+		},
+		"1-Comptes de capitaux (ACTIF ET LIAISON)": {
+			"root_type": "Asset",
+			"10-Capital et r\u00e9serves": {
+				"Actionnaires : capital souscrit - non appel\u00e9": {
+					"account_number": "109"
+				}
+			},
+			"16-Emprunts et dettes assimil\u00e9es, fonds non remboursables et avances conditionn\u00e9es": {
+				"Primes de remboursement des emprunts": {
+					"account_number": "169"
 				}
 			},
 			"18-Comptes de liaison des \u00e9tablissements et soci\u00e9t\u00e9s en participation": {
@@ -297,11 +310,11 @@
 				}
 			},
 			"21-Immobilisations corporelles": {
-                "account_type": "Fixed Asset",
+				"account_type": "Fixed Asset",
 				"211-Terrains": {
-                    "account_type": "Fixed Asset",
+					"account_type": "Fixed Asset",
 					"Terrains nus": {
-                        "account_type": "Fixed Asset",
+						"account_type": "Fixed Asset",
 						"account_number": "2111"
 					},
 					"Terrains am\u00e9nag\u00e9s": {
@@ -413,11 +426,7 @@
 					}
 				}
 			},
-			"22-Immobilisations mises en concession": {
-				"Droits du conc\u00e9dant": {
-					"account_number": "229"
-				}
-			},
+			"22-Immobilisations mises en concession": {},
 			"23-Immobilisations en cours, avances et acomptes": {
 				"Immobilisations corporelles en cours": {
 					"account_number": "231"
@@ -558,7 +567,7 @@
 				}
 			},
 			"28-Amortissements des immobilisations": {
-                "account_type": "Accumulated Depreciation",
+				"account_type": "Accumulated Depreciation",
 				"280-Amortissements des immobilisations incorporelles et des frais d'\u00e9tablissement (m\u00eame ventilation que celle du compte 20)": {
 					"account_type": "Accumulated Depreciation",
 					"Frais d'\u00e9tablissement (m\u00eame ventilation que celle du compte 201)": {
@@ -789,7 +798,7 @@
 				"account_number": "36"
 			},
 			"Stocks de marchandises": {
-                "account_type": "Stock",
+				"account_type": "Stock",
 				"account_number": "37"
 			},
 			"Le compte 38 peut \u00eatre utilis\u00e9 pour comptabiliser les stocks en voie d'acheminement, mis en d\u00e9p\u00f4t ou donn\u00e9s en consignation": {
@@ -840,7 +849,7 @@
 				}
 			},
 			"41-Clients et comptes rattach\u00e9s (ACTIF)": {
-                "account_type": "Receivable",
+				"account_type": "Receivable",
 				"411-Clients": {
 					"account_type": "Receivable",
 					"Clients - Ventes de biens ou de prestations de services": {
@@ -861,7 +870,7 @@
 					"account_number": "416"
 				},
 				"418-Clients - Produits non encore factur\u00e9s": {
-                    "account_type": "Receivable",
+					"account_type": "Receivable",
 					"Clients - Factures \u00e0 \u00e9tablir": {
 						"account_type": "Receivable",
 						"account_number": "4181"
@@ -877,6 +886,11 @@
 					"account_number": "425"
 				}
 			},
+			"43-S\u00e9curit\u00e9 sociale et autres organismes sociaux (ACTIF)": {
+				"Organismes sociaux - Produits \u00e0 recevoir": {
+					"account_number": "439"
+				}
+			},
 			"44-\u00c9tat et autres collectivit\u00e9s publiques (ACTIF)": {
 				"\u00c9tat - Subventions et aides \u00e0 recevoir": {
 					"account_number": "441"
@@ -887,7 +901,7 @@
 						"account_type": "Tax",
 						"tax_rate": -20
 					},
-					"TVA à décaisser": {
+					"TVA \u00e0 d\u00e9caisser": {
 						"account_number": "44551"
 					},
 					"4456-Taxes sur le chiffre d'affaires d\u00e9ductibles": {
@@ -912,22 +926,22 @@
 							"account_number": "44568",
 							"account_type": "Tax"
 						},
-						"TVA 20% Déductible": {
+						"TVA 20% D\u00e9ductible": {
 							"account_number": "445620",
 							"account_type": "Tax",
 							"tax_rate": 20
 						},
-						"TVA 10% Déductible": {
+						"TVA 10% D\u00e9ductible": {
 							"account_number": "445610",
 							"account_type": "Tax",
 							"tax_rate": 10
 						},
-						"TVA 5.5% Déductible": {
+						"TVA 5.5% D\u00e9ductible": {
 							"account_number": "445655",
 							"account_type": "Tax",
 							"tax_rate": 5.5
 						},
-						"TVA 2.1% Déductible": {
+						"TVA 2.1% D\u00e9ductible": {
 							"account_number": "445621",
 							"account_type": "Tax",
 							"tax_rate": 2.1
@@ -975,6 +989,17 @@
 				}
 			},
 			"47-Comptes transitoires ou d'attente (ACTIF)": {
+				"474-Diff\u00e9rences d\u2019\u00e9valuation \u2013 Actif": {
+					"Diff\u00e9rences d'\u00e9valuation sur instruments financiers \u00e0 terme - Actif": {
+						"account_number": "4741"
+					},
+					"Diff\u00e9rences d'\u00e9valuation sur jetons d\u00e9tenus - Actif": {
+						"account_number": "4742"
+					},
+					"Diff\u00e9rences d\u2019\u00e9valuation de jetons sur des passifs - Actif": {
+						"account_number": "4746"
+					}
+				},
 				"476-Diff\u00e9rence de conversion - Actif": {
 					"Diminution des cr\u00e9ances": {
 						"account_number": "4761"
@@ -1006,6 +1031,9 @@
 				}
 			},
 			"49-D\u00e9pr\u00e9ciations des comptes de tiers (ACTIF)": {
+				"D\u00e9pr\u00e9ciations des comptes de clients": {
+					"account_number": "491"
+				},
 				"495-D\u00e9pr\u00e9ciations des comptes du groupe et des associ\u00e9s": {
 					"Comptes du groupe": {
 						"account_number": "4951"
@@ -1033,7 +1061,7 @@
 		"4-Comptes de tiers (PASSIF)": {
 			"root_type": "Liability",
 			"40-Fournisseurs et comptes rattach\u00e9s (PASSIF)": {
-                "account_type": "Payable",
+				"account_type": "Payable",
 				"401-Fournisseurs": {
 					"Fournisseurs - Achats de biens et prestations de services": {
 						"account_type": "Payable",
@@ -1045,11 +1073,11 @@
 					}
 				},
 				"Fournisseurs - Effets \u00e0 payer": {
-               		"account_type": "Payable",
+					"account_type": "Payable",
 					"account_number": "403"
 				},
 				"404-Fournisseurs d'immobilisations": {
-               		"account_type": "Payable",
+					"account_type": "Payable",
 					"Fournisseurs - Achats d'immobilisations": {
 						"account_type": "Payable",
 						"account_number": "4041"
@@ -1073,7 +1101,7 @@
 						"account_number": "4084"
 					},
 					"Fournisseurs - Int\u00e9r\u00eats courus": {
-                   		"account_type": "Stock Received But Not Billed",
+						"account_type": "Stock Received But Not Billed",
 						"account_number": "4088"
 					}
 				}
@@ -1145,8 +1173,16 @@
 				}
 			},
 			"44-\u00c9tat et autres collectivit\u00e9s publiques (PASSIF)": {
-				"Contributions, imp\u00f4ts et taxes recouvr\u00e9s pour le compte de l'\u00c9tat": {
-					"account_number": "442"
+				"442-Contributions, imp\u00f4ts et taxes recouvr\u00e9s pour le compte de l'\u00c9tat": {
+					"Pr\u00e9l\u00e8vements \u00e0 la source (Imp\u00f4t sur le revenu)": {
+						"account_number": "4421"
+					},
+					"Pr\u00e9l\u00e8vements forfaitaires non lib\u00e9ratoires": {
+						"account_number": "4422"
+					},
+					"Retenues et pr\u00e9l\u00e8vements sur les distributions": {
+						"account_number": "4423"
+					}
 				},
 				"\u00c9tat - Imp\u00f4ts sur les b\u00e9n\u00e9fices": {
 					"account_number": "444"
@@ -1159,23 +1195,23 @@
 					},
 					"4457-Taxes sur le chiffre d'affaires collect\u00e9es": {
 						"44571-TVA collect\u00e9e": {
-                            "account_type": "Tax",
-							"TVA 20% Collectée": {
+							"account_type": "Tax",
+							"TVA 20% Collect\u00e9e": {
 								"account_type": "Tax",
 								"account_number": "445720",
 								"tax_rate": 20
 							},
-							"TVA 10% Collectée": {
+							"TVA 10% Collect\u00e9e": {
 								"account_type": "Tax",
 								"account_number": "445710",
 								"tax_rate": 10
 							},
-							"TVA 5.5% Collectée": {
+							"TVA 5.5% Collect\u00e9e": {
 								"account_type": "Tax",
 								"account_number": "445755",
 								"tax_rate": 5.5
 							},
-							"TVA 2.1% Collectée": {
+							"TVA 2.1% Collect\u00e9e": {
 								"account_type": "Tax",
 								"account_number": "445721",
 								"tax_rate": 2.1
@@ -1199,6 +1235,16 @@
 				},
 				"Autres imp\u00f4ts, taxes et versements assimil\u00e9s": {
 					"account_number": "447"
+				},
+				"448-\u00c9tat - Charges \u00e0 payer et produits \u00e0 recevoir": {
+					"4481-\u00c9tat - Charges \u00e0 payer": {
+						"Charges fiscales sur cong\u00e9s \u00e0 payer": {
+							"account_number": "44811"
+						},
+						"Charges \u00e0 payer": {
+							"account_number": "44812"
+						}
+					}
 				},
 				"Quotas d'\u00e9mission \u00e0 acqu\u00e9rir": {
 					"account_number": "449"
@@ -1260,8 +1306,19 @@
 			},
 			"47-Comptes transitoires ou d'attente (PASSIF)": {
 				"Comptes d'attente": {
-                    "account_type": "Temporary",
+					"account_type": "Temporary",
 					"account_number": "471"
+				},
+				"475-Diff\u00e9rences d\u2019\u00e9valuation \u2013 Passif": {
+					"Diff\u00e9rences d'\u00e9valuation sur instruments financiers \u00e0 terme - Passif": {
+						"account_number": "4751"
+					},
+					"Diff\u00e9rences d'\u00e9valuation sur jetons d\u00e9tenus - Passif": {
+						"account_number": "4752"
+					},
+					"Diff\u00e9rences d\u2019\u00e9valuation de jetons sur des passifs - Passif": {
+						"account_number": "4756"
+					}
 				},
 				"477-Diff\u00e9rences de conversion - Passif": {
 					"Augmentation des cr\u00e9ances": {
@@ -1292,7 +1349,7 @@
 				"account_number": "49"
 			}
 		},
-		"5-Comptes financiers": {
+		"5-Comptes financiers (ACTIF)": {
 			"root_type": "Asset",
 			"50-Valeurs mobili\u00e8res de placement": {
 				"502-Actions propres": {
@@ -1364,7 +1421,7 @@
 						"account_number": "5121"
 					},
 					"Comptes en devises": {
-	                    "account_type": "Bank",
+						"account_type": "Bank",
 						"account_number": "5124"
 					}
 				},
@@ -1372,22 +1429,8 @@
 					"account_number": "517"
 				},
 				"518-Int\u00e9r\u00eats courus": {
-					"Int\u00e9r\u00eats courus \u00e0 payer": {
-						"account_number": "5181"
-					},
 					"Int\u00e9r\u00eats courus \u00e0 recevoir": {
 						"account_number": "5188"
-					}
-				},
-				"519-Concours bancaires courants": {
-					"Cr\u00e9dit de mobilisation de cr\u00e9ances commerciales": {
-						"account_number": "5191"
-					},
-					"Mobilisation de cr\u00e9ances n\u00e9es \u00e0 l'\u00e9tranger": {
-						"account_number": "5193"
-					},
-					"Int\u00e9r\u00eats courus sur concours bancaires courants": {
-						"account_number": "5198"
 					}
 				}
 			},
@@ -1406,7 +1449,7 @@
 				}
 			},
 			"Caisse": {
-                "account_type": "Cash",
+				"account_type": "Cash",
 				"account_number": "53"
 			},
 			"Virements internes": {
@@ -1425,6 +1468,27 @@
 					},
 					"Autres valeurs mobili\u00e8res de placement et cr\u00e9ances assimil\u00e9es": {
 						"account_number": "5908"
+					}
+				}
+			}
+		},
+		"5-Comptes financiers (PASSIF)": {
+			"root_type": "Liability",
+			"51-Banques, \u00e9tablissements financiers et assimil\u00e9s": {
+				"518-Int\u00e9r\u00eats courus": {
+					"Int\u00e9r\u00eats courus \u00e0 payer": {
+						"account_number": "5181"
+					}
+				},
+				"519-Concours bancaires courants": {
+					"Cr\u00e9dit de mobilisation de cr\u00e9ances commerciales": {
+						"account_number": "5191"
+					},
+					"Mobilisation de cr\u00e9ances n\u00e9es \u00e0 l'\u00e9tranger": {
+						"account_number": "5193"
+					},
+					"Int\u00e9r\u00eats courus sur concours bancaires courants": {
+						"account_number": "5198"
 					}
 				}
 			}
@@ -1491,7 +1555,7 @@
 					"account_number": "605"
 				},
 				"606-Achats non stock\u00e9s de mati\u00e8re et fournitures": {
-                    "account_type": "Cost of Goods Sold",
+					"account_type": "Cost of Goods Sold",
 					"Fournitures non stockables (eau, \u00e9nergie, etc.)": {
 						"account_type": "Cost of Goods Sold",
 						"account_number": "6061"
@@ -1510,7 +1574,7 @@
 					}
 				},
 				"Achats de marchandises": {
-                    "account_type": "Cost of Goods Sold",
+					"account_type": "Cost of Goods Sold",
 					"account_number": "607"
 				},
 				"Compte r\u00e9serv\u00e9, le cas \u00e9ch\u00e9ant, au regroupement des frais accessoires incorpor\u00e9s aux achats": {
@@ -1678,7 +1742,7 @@
 						"account_type": "Chargeable"
 					},
 					"Transports sur ventes": {
-                        "account_type": "Chargeable",
+						"account_type": "Chargeable",
 						"account_number": "6242"
 					},
 					"Transports entre \u00e9tablissements ou chantiers": {
@@ -1975,7 +2039,7 @@
 					"account_number": "665"
 				},
 				"Pertes de change financi\u00e8res": {
-                    "account_type": "Round Off",
+					"account_type": "Round Off",
 					"account_number": "666"
 				},
 				"667-Charges sur cession d'\u00e9l\u00e9ments financiers": {
@@ -2007,17 +2071,17 @@
 				}
 			},
 			"68-Dotations aux amortissements, aux d\u00e9pr\u00e9ciations et aux provisions": {
-                "account_type": "Depreciation",
+				"account_type": "Depreciation",
 				"681-Dotations aux amortissements, aux d\u00e9pr\u00e9ciations et aux provisions (\u00e0 inscrire dans les charges d'exploitation)": {
 					"account_type": "Depreciation",
 					"6811-Dotations aux amortissements sur immobilisations incorporelles et corporelles": {
 						"account_type": "Depreciation",
 						"Immobilisations incorporelles et frais d'\u00e9tablissement": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68111"
 						},
 						"Immobilisations corporelles": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68112"
 						}
 					},
@@ -2037,39 +2101,39 @@
 						}
 					},
 					"6817-Dotations pour d\u00e9pr\u00e9ciations des actifs circulants": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"Stocks et en-cours": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68173"
 						},
 						"Cr\u00e9ances": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68174"
 						}
 					}
 				},
 				"686-Dotations aux amortissements, aux d\u00e9pr\u00e9ciations et aux provisions (\u00e0 inscrire dans les charges financi\u00e8res)": {
-                	"account_type": "Depreciation",
+					"account_type": "Depreciation",
 					"Dotations aux amortissements des primes de remboursement des emprunts": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6861"
 					},
 					"Dotations aux amortissements des frais d'\u00e9mission des emprunts": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6862"
 					},
 					"Dotations aux provisions financi\u00e8res": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6865"
 					},
 					"6866-Dotations pour d\u00e9pr\u00e9ciation des \u00e9l\u00e9ments financiers": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"Immobilisations financi\u00e8res": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68662"
 						},
 						"Valeurs mobili\u00e8res de placement": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68665"
 						}
 					}
@@ -2077,30 +2141,30 @@
 				"687-Dotations aux amortissements, aux d\u00e9pr\u00e9ciations et aux provisions (\u00e0 inscrire dans les charges exceptionnelles)": {
 					"account_type": "Depreciation",
 					"Dotations aux amortissements exceptionnels des immobilisations": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6871"
 					},
-					"Dotations aux provisions r\u00e9glement\u00e9es (immobilisations)": {
-                		"account_type": "Depreciation",
+					"6872-Dotations aux provisions r\u00e9glement\u00e9es (immobilisations)": {
+						"account_type": "Depreciation",
 						"Amortissements d\u00e9rogatoires": {
-                			"account_type": "Depreciation",
+							"account_type": "Depreciation",
 							"account_number": "68725"
 						}
 					},
 					"Dotations aux provisions r\u00e9glement\u00e9es (stocks)": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6873"
 					},
 					"Dotations aux autres provisions r\u00e9glement\u00e9es": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6874"
 					},
 					"Dotations aux provisions exceptionnelles": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6875"
 					},
 					"Dotations pour d\u00e9pr\u00e9ciations exceptionnelles": {
-                		"account_type": "Depreciation",
+						"account_type": "Depreciation",
 						"account_number": "6876"
 					}
 				}
@@ -2161,7 +2225,7 @@
 					"Marchandises": {
 						"account_number": "7071"
 					},
-					"Éco-participation": {
+					"\u00c9co-participation": {
 						"account_type": "Income Account",
 						"account_number": "7079"
 					}
@@ -2369,7 +2433,7 @@
 					"account_number": "765"
 				},
 				"Gains de change financiers": {
-                    "account_type": "Round Off",
+					"account_type": "Round Off",
 					"account_number": "766"
 				},
 				"767-Produits sur cession d'\u00e9l\u00e9ments financiers": {
@@ -2461,6 +2525,14 @@
 					"Reprises sur d\u00e9pr\u00e9ciations exceptionnelles": {
 						"account_number": "7876"
 					}
+				}
+			}
+		},
+		"2-Comptes d'immobilisations (AUTRES FONDS PROPRES)": {
+			"root_type": "Equity",
+			"22-Immobilisations mises en concession": {
+				"Droits du conc\u00e9dant (pr\u00e9sent\u00e9s dans la rubrique autres fonds propres)": {
+					"account_number": "229"
 				}
 			}
 		}

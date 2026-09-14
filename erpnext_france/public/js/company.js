@@ -21,7 +21,7 @@ frappe.ui.form.on("Company", {
   refresh: function (frm) {
     if (
       !frm.is_new() &&
-      frm.doc.country === "France" &&
+      ["France", "Réunion"].includes(frm.doc.country) &&
       frm.has_perm("write")
     ) {
       frm.remove_custom_button(__("Create Tax Template"), __("Manage"));

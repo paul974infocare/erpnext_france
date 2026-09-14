@@ -65,7 +65,7 @@ def setup_wizard_complete(args, action=None):
 
 
 def setup_company_default(company, action):
-	if company.country != "France":
+	if company.country not in ("France", "Réunion"):
 		return
 
 	if not frappe.db.sql(

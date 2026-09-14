@@ -6,7 +6,11 @@ from frappe.utils import getdate
 
 @frappe.whitelist()
 def make_sales_invoice_with_payment_terms(source_name, target_doc=None, ignore_permissions=False):
-	doclist = make_sales_invoice(source_name, target_doc, ignore_permissions)
+	doclist = make_sales_invoice(
+    		source_name,
+    		target_doc,
+    		ignore_permissions=ignore_permissions,
+	)
 
 	customer = frappe.get_doc("Customer", doclist.get("customer"))
 	doclist.payment_terms_template = customer.get("payment_terms")

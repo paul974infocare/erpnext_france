@@ -13,7 +13,7 @@ SUPPORTED_COUNTRIES = (
     "France",
     "Guadeloupe",
     "Martinique",
-    "Guyane",
+    "French Guiana",
     "Réunion",
     "Mayotte",
 )

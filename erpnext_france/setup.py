@@ -69,7 +69,7 @@ def setup_company_default(company, action):
         "France",
         "Guadeloupe",
         "Martinique",
-        "Guyane",
+        "French Guiana",
         "Réunion",
         "Mayotte",
     ):

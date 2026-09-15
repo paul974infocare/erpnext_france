@@ -25,7 +25,7 @@ frappe.ui.form.on("Company", {
     "France",
     "Guadeloupe",
     "Martinique",
-    "Guyane",
+    "French Guiana",
     "Réunion",
     "Mayotte",
 ].includes(frm.doc.country) &&

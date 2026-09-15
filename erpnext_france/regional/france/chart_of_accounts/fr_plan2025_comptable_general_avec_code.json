@@ -945,6 +945,11 @@
 							"account_number": "445621",
 							"account_type": "Tax",
 							"tax_rate": 2.1
+						},
+						"TVA 8.5% Déductible": {
+							"account_number": "445685",
+							"account_type": "Tax",
+							"tax_rate": 8.5
 						}
 					},
 					"4458-Taxes sur le chiffre d'affaires \u00e0 r\u00e9gulariser ou en attente": {
@@ -1215,6 +1220,11 @@
 								"account_type": "Tax",
 								"account_number": "445721",
 								"tax_rate": 2.1
+							},
+							"TVA 8.5% Collectée": {
+								"account_type": "Tax",
+								"account_number": "445785",
+								"tax_rate": 8.5
 							}
 						},
 						"Taxes assimil\u00e9es \u00e0 la TVA": {

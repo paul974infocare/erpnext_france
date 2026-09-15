@@ -73,7 +73,10 @@ def add_down_payment_without_tva(order, down_payment_invoice, values):
 		return
 
 	down_payment_item = frappe.get_cached_doc("Item", down_payment_items[0].name)
-	income_account = get_down_payment_item_default(down_payment_item.item_code)
+	income_account = get_down_payment_item_default(
+			down_payment_item.item_code,
+			order.company,
+	)
 
 	if not income_account or income_account == "":
 		frappe.throw(
@@ -120,7 +123,10 @@ def add_down_payment_with_tva(order, down_payment_invoice, values):
 		return
 
 	down_payment_item = frappe.get_cached_doc("Item", down_payment_items[0].name)
-	income_account = get_down_payment_item_default(down_payment_item.item_code)
+	income_account = get_down_payment_item_default(
+			down_payment_item.item_code,
+			order.company,
+	)
 
 	if not income_account or income_account == "":
 		frappe.throw(

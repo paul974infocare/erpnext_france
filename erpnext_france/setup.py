@@ -118,6 +118,8 @@ def default_accounts_mapping(accounts):
 		"default_income_account": 7071,
 		"default_deferred_revenue_account": 487,
 		"default_deferred_expense_account": 486,
+		"default_advance_received_account": 4191,
+		"default_advance_paid_account": 4091,
 	}
 
 	return {

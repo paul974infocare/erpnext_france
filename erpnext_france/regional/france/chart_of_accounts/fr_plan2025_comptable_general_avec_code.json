@@ -901,6 +901,10 @@
 						"account_type": "Tax",
 						"tax_rate": -20
 					},
+					"TVA due à l'importation": {
+						"account_number": "4453",
+						"account_type": "Tax"
+					},
 					"TVA \u00e0 d\u00e9caisser": {
 						"account_number": "44551"
 					},

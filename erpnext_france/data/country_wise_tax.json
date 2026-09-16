@@ -9,7 +9,7 @@
 			"Vente - Export"
 		],
 		"chart_of_accounts": {
-			"France - Plan Comptable General 2025 avec code": {
+			"Plan Comptable Général": {
 				"sales_tax_templates": [
 					{
 						"title": "TVA 20% Collectée",
@@ -315,6 +315,181 @@
 								},
 								"description": "TVA due intracommunautaire",
 								"rate": -20
+							}
+						]
+					}
+				]
+			}
+		}
+	},
+	"Réunion": {
+		"tax_categories": [
+			"Vente Domestique",
+			"Achat Domestique",
+			"Vente Biens - Métropole",
+			"Achat Biens - Métropole"
+		],
+		"chart_of_accounts": {
+			"Plan Comptable Général": {
+				"sales_tax_templates": [
+					{
+						"title": "TVA 8.5% Collectée",
+						"tax_category": "Vente Domestique",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "TVA 8.5% Collectée",
+									"account_number": "445785",
+									"root_type": "Liability",
+									"tax_rate": 8.5
+								},
+								"description": "TVA 8.5%",
+								"rate": 8.5
+							}
+						]
+					},
+					{
+						"title": "TVA 2.1% Collectée",
+						"tax_category": "Vente Domestique",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "TVA 2.1% Collectée",
+									"account_number": "445721",
+									"root_type": "Liability",
+									"tax_rate": 2.1
+								},
+								"description": "TVA 2.1%",
+								"rate": 2.1
+							}
+						]
+					},
+					{
+						"title": "Export Biens Réunion vers Métropole",
+						"tax_category": "Vente Biens - Métropole",
+						"taxes": []
+					}
+				],
+				"purchase_tax_templates": [
+					{
+						"title": "TVA 8.5% Déductible",
+						"tax_category": "Achat Domestique",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "TVA 8.5% Déductible",
+									"account_number": "445685",
+									"root_type": "Asset",
+									"tax_rate": 8.5
+								},
+								"description": "TVA 8.5%",
+								"rate": 8.5
+							}
+						]
+					},
+					{
+						"title": "TVA 2.1% Déductible",
+						"tax_category": "Achat Domestique",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "TVA 2.1% Déductible",
+									"account_number": "445621",
+									"root_type": "Asset",
+									"tax_rate": 2.1
+								},
+								"description": "TVA 2.1%",
+								"rate": 2.1
+							}
+						]
+					},
+					{
+						"title": "Import Biens Métropole vers Réunion - TVA 8.5%",
+						"tax_category": "Achat Biens - Métropole",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "TVA due à l'importation",
+									"account_number": "4453",
+									"root_type": "Asset",
+									"tax_rate": 8.5
+								},
+								"description": "TVA à l'importation 8.5%",
+								"rate": 8.5,
+								"add_deduct_tax": "Deduct"
+							},
+							{
+								"account_head": {
+									"account_name": "TVA 8.5% Déductible",
+									"account_number": "445685",
+									"root_type": "Asset",
+									"tax_rate": 8.5
+								},
+								"description": "TVA 8.5% Déductible",
+								"rate": 8.5,
+								"add_deduct_tax": "Add"
+							}
+						]
+					}
+				],
+				"item_tax_templates": [
+					{
+						"title": "TVA 8.5% Déductible - Achat",
+						"taxes": [
+							{
+								"tax_type": {
+									"account_name": "TVA 8.5% Déductible",
+									"account_number": "445685",
+									"root_type": "Asset",
+									"tax_rate": 8.5
+								},
+								"description": "TVA 8.5%",
+								"tax_rate": 8.5
+							}
+						]
+					},
+					{
+						"title": "TVA 2.1% Déductible - Achat",
+						"taxes": [
+							{
+								"tax_type": {
+									"account_name": "TVA 2.1% Déductible",
+									"account_number": "445621",
+									"root_type": "Asset",
+									"tax_rate": 2.1
+								},
+								"description": "TVA 2.1%",
+								"tax_rate": 2.1
+							}
+						]
+					},
+					{
+						"title": "TVA 8.5% Collectée - Vente",
+						"taxes": [
+							{
+								"tax_type": {
+									"account_name": "TVA 8.5% Collectée",
+									"account_number": "445785",
+									"root_type": "Liability",
+									"tax_rate": 8.5
+								},
+								"description": "TVA 8.5%",
+								"tax_rate": 8.5
+							}
+						]
+					},
+					{
+						"title": "TVA 2.1% Collectée - Vente",
+						"taxes": [
+							{
+								"tax_type": {
+									"account_name": "TVA 2.1% Collectée",
+									"account_number": "445721",
+									"root_type": "Liability",
+									"tax_rate": 2.1
+								},
+								"description": "TVA 2.1%",
+								"tax_rate": 2.1
 							}
 						]
 					}

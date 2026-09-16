@@ -327,7 +327,9 @@
 			"Vente Domestique",
 			"Achat Domestique",
 			"Vente Biens - Métropole",
-			"Achat Biens - Métropole"
+			"Achat Biens - Métropole",
+                       "Vente Services - Métropole",
+                       "Achat Services - Métropole"
 		],
 		"chart_of_accounts": {
 			"Plan Comptable Général": {
@@ -368,7 +370,23 @@
 						"title": "Export Biens Réunion vers Métropole",
 						"tax_category": "Vente Biens - Métropole",
 						"taxes": []
-					}
+					},
+                                       {
+                                                "title": "Services Réunion vers Métropole - TVA 20%",
+                                                "tax_category": "Vente Services - Métropole",
+                                                "taxes": [
+                                                        {
+                                                                "account_head": {
+                                                                        "account_name": "TVA 20% Collectée",
+                                                                        "account_number": "445720",
+                                                                        "root_type": "Liability",
+                                                                        "tax_rate": 20.0
+                                                                },
+                                                                "description": "TVA 20% - Services Réunion vers Métropole",
+                                                                "rate": 20
+                                                        }
+                                                ]
+                                        }
 				],
 				"purchase_tax_templates": [
 					{
@@ -430,7 +448,24 @@
 								"add_deduct_tax": "Add"
 							}
 						]
-					}
+					},
+                                       {
+                                                "title": "Services Métropole vers Réunion - TVA 8.5%",
+                                                "tax_category": "Achat Services - Métropole",
+                                                "taxes": [
+                                                        {
+                                                                "account_head": {
+                                                                        "account_name": "TVA 8.5% Déductible",
+                                                                        "account_number": "445685",
+                                                                        "root_type": "Asset",
+                                                                        "tax_rate": 8.5
+                                                                },
+                                                                "description": "TVA 8.5% - Services Métropole vers Réunion",
+                                                                "rate": 8.5,
+                                                                "add_deduct_tax": "Add"
+                                                        }
+                                                ]
+                                        }
 				],
 				"item_tax_templates": [
 					{

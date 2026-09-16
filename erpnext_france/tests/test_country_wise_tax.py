@@ -30,6 +30,8 @@ class TestCountryWiseTax(unittest.TestCase):
                                 "Achat Domestique",
                                 "Vente Biens - Métropole",
                                 "Achat Biens - Métropole",
+                                "Vente Services - Métropole",
+                                "Achat Services - Métropole",
                         ],
                 )
                 self.assertEqual(
@@ -38,6 +40,7 @@ class TestCountryWiseTax(unittest.TestCase):
                                 "TVA 8.5% Collectée",
                                 "TVA 2.1% Collectée",
                                 "Export Biens Réunion vers Métropole",
+                                "Services Réunion vers Métropole - TVA 20%",
                         ],
                 )
                 self.assertEqual(
@@ -46,6 +49,7 @@ class TestCountryWiseTax(unittest.TestCase):
                                 "TVA 8.5% Déductible",
                                 "TVA 2.1% Déductible",
                                 "Import Biens Métropole vers Réunion - TVA 8.5%",
+                                "Services Métropole vers Réunion - TVA 8.5%",
                         ],
                 )
                 self.assertEqual(
@@ -129,6 +133,55 @@ class TestCountryWiseTax(unittest.TestCase):
                         ("445685", "Asset", 8.5, "Add"),
                 )
 
+        def test_reunion_service_sale_to_metropole_uses_20_percent_vat(self):
+                chart = self.dataset["Réunion"]["chart_of_accounts"]["Plan Comptable Général"]
+
+                template = next(
+                        template
+                        for template in chart["sales_tax_templates"]
+                        if template["title"] == "Services Réunion vers Métropole - TVA 20%"
+                )
+
+                self.assertEqual(template["tax_category"], "Vente Services - Métropole")
+                self.assertEqual(len(template["taxes"]), 1)
+
+                tax = template["taxes"][0]
+
+                self.assertEqual(
+                        (
+                                tax["account_head"]["account_number"],
+                                tax["account_head"]["root_type"],
+                                tax["rate"],
+                        ),
+                        ("445720", "Liability", 20),
+                )
+
+        def test_reunion_service_purchase_from_metropole_uses_reunion_vat(self):
+                chart = self.dataset["Réunion"]["chart_of_accounts"]["Plan Comptable Général"]
+
+                template = next(
+                        template
+                        for template in chart["purchase_tax_templates"]
+                        if template["title"] == "Services Métropole vers Réunion - TVA 8.5%"
+                )
+
+                self.assertEqual(template["tax_category"], "Achat Services - Métropole")
+                self.assertEqual(len(template["taxes"]), 1)
+
+                tax = template["taxes"][0]
+
+                self.assertEqual(
+                        (
+                                tax["account_head"]["account_number"],
+                                tax["account_head"]["root_type"],
+                                tax["rate"],
+                                tax["add_deduct_tax"],
+                        ),
+                        ("445685", "Asset", 8.5, "Add"),
+                )
+
+                self.assertNotEqual(tax["account_head"]["account_number"], "4453")
+
         def test_reunion_has_no_excluded_tax_configuration(self):
                 reunion = self.dataset["Réunion"]
                 chart = reunion["chart_of_accounts"]["Plan Comptable Général"]
@@ -138,7 +191,7 @@ class TestCountryWiseTax(unittest.TestCase):
                 self.assertNotIn("Vente - EU", reunion["tax_categories"])
                 self.assertNotIn("Intracommunautaire", serialized)
 
-                for excluded_rate in (20, 10, 5.5, 1.75, 1.05):
+                for excluded_rate in (10, 5.5, 1.75, 1.05):
                         self.assertNotIn(excluded_rate, self._rates(chart))
 
         def _rates(self, chart):

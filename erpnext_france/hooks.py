@@ -98,6 +98,12 @@ fixtures = [
 					"Sales Invoice-is_down_payment_invoice",
 					"Sales Invoice-subscription",
 					"Sales Invoice-custom_do_not_calc_france_vat",
+                                        "Sales Invoice-custom_france_fiscal_legal_reference",
+                                        "Sales Invoice-custom_france_fiscal_invoice_mention",
+                                        "Sales Invoice-custom_france_fiscal_invoice_mention_html",
+                                        "Sales Invoice-custom_france_fiscal_mention_section",
+                                        "Tax Category-custom_france_fiscal_legal_reference",
+                                        "Tax Category-custom_france_fiscal_invoice_mention",
 					"Sales Invoice Advance-is_down_payment",
 					"Sales Invoice Item-down_payment_rate",
 					"Sales Invoice Item-is_down_payment_item",
@@ -376,7 +382,10 @@ doc_events = {
 		"on_submit": [
 			"erpnext_france.utils.transaction_log.create_transaction_log",
 		],
-		"before_save": "erpnext_france.controllers.taxes.before_save",
+		"before_save": [
+			"erpnext_france.controllers.taxes.before_save",
+			"erpnext_france.controllers.fiscal_information.sync_sales_invoice_fiscal_information",
+		],
 		"validate": [
 			"erpnext_france.erpnext_france.overrides.sales_invoice.validate",
 			"erpnext_france.controllers.item_account_gl.get_correct_default_account_validate",

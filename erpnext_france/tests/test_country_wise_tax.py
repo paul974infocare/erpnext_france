@@ -87,6 +87,22 @@ class TestCountryWiseTax(unittest.TestCase):
                                 expected[template["title"]],
                         )
 
+        def test_reunion_goods_sale_to_metropole_has_fiscal_metadata(self):
+                metadata = self.dataset["Réunion"]["france_fiscal_metadata"]
+
+                self.assertEqual(
+                        set(metadata),
+                        {"Vente Biens - Métropole"},
+                )
+                self.assertEqual(
+                        metadata["Vente Biens - Métropole"]["legal_reference"],
+                        "Article 294 CGI ; Article L.211-7 CIBS",
+                )
+                self.assertEqual(
+                        metadata["Vente Biens - Métropole"]["invoice_mention"],
+                        "Exonération de TVA en application des articles 294 du Code général des impôts (CGI) et L211-7 du Code des Impositions sur les Biens et Services (CIBS)",
+                )
+
         def test_reunion_goods_sale_to_metropole_is_tax_free_template(self):
                 chart = self.dataset["Réunion"]["chart_of_accounts"]["Plan Comptable Général"]
 

@@ -331,6 +331,12 @@
                        "Vente Services - Métropole",
                        "Achat Services - Métropole"
 		],
+		"france_fiscal_metadata": {
+		        "Vente Biens - Métropole": {
+		                "legal_reference": "Article 294 CGI ; Article L.211-7 CIBS",
+		                "invoice_mention": "Exonération de TVA en application des articles 294 du Code général des impôts (CGI) et L211-7 du Code des Impositions sur les Biens et Services (CIBS)"
+		        }
+		},
 		"chart_of_accounts": {
 			"Plan Comptable Général": {
 				"sales_tax_templates": [

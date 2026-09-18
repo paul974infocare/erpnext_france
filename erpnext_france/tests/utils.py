@@ -47,7 +47,7 @@ def before_tests():
 def _enable_all_roles_for_admin():
 	from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to
 
-	all_roles = set(frappe.db.get_values("Role", pluck="name"))
+	all_roles = set(frappe.db.get_values("Role", pluck="name") or [])
 	admin_roles = set(
 		frappe.db.get_values("Has Role", {"parent": "Administrator"}, fieldname="role", pluck="role")
 	)

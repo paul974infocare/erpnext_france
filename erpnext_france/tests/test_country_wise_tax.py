@@ -48,7 +48,6 @@ class TestCountryWiseTax(unittest.TestCase):
                         [
                                 "TVA 8.5% Déductible",
                                 "TVA 2.1% Déductible",
-                                "Import Biens Métropole vers Réunion - TVA 8.5%",
                                 "Services Métropole vers Réunion - TVA 8.5%",
                         ],
                 )
@@ -115,38 +114,18 @@ class TestCountryWiseTax(unittest.TestCase):
                 self.assertEqual(template["tax_category"], "Vente Biens - Métropole")
                 self.assertEqual(template["taxes"], [])
 
-        def test_reunion_goods_import_from_metropole_uses_import_vat_accounts(self):
+        def test_reunion_goods_import_from_metropole_has_no_purchase_tax_template(self):
                 chart = self.dataset["Réunion"]["chart_of_accounts"]["Plan Comptable Général"]
 
-                template = next(
-                        template
-                        for template in chart["purchase_tax_templates"]
-                        if template["title"] == "Import Biens Métropole vers Réunion - TVA 8.5%"
+                self.assertIn(
+                        "Achat Biens - Métropole",
+                        self.dataset["Réunion"]["tax_categories"],
                 )
-
-                self.assertEqual(template["tax_category"], "Achat Biens - Métropole")
-                self.assertEqual(len(template["taxes"]), 2)
-
-                import_vat, deductible_vat = template["taxes"]
-
-                self.assertEqual(
-                        (
-                                import_vat["account_head"]["account_number"],
-                                import_vat["account_head"]["root_type"],
-                                import_vat["rate"],
-                                import_vat["add_deduct_tax"],
-                        ),
-                        ("4453", "Asset", 8.5, "Deduct"),
-                )
-
-                self.assertEqual(
-                        (
-                                deductible_vat["account_head"]["account_number"],
-                                deductible_vat["account_head"]["root_type"],
-                                deductible_vat["rate"],
-                                deductible_vat["add_deduct_tax"],
-                        ),
-                        ("445685", "Asset", 8.5, "Add"),
+                self.assertFalse(
+                        any(
+                                template.get("tax_category") == "Achat Biens - Métropole"
+                                for template in chart["purchase_tax_templates"]
+                        )
                 )
 
         def test_reunion_service_sale_to_metropole_uses_20_percent_vat(self):

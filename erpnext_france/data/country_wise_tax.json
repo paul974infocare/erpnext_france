@@ -427,34 +427,6 @@
 							}
 						]
 					},
-					{
-						"title": "Import Biens Métropole vers Réunion - TVA 8.5%",
-						"tax_category": "Achat Biens - Métropole",
-						"taxes": [
-							{
-								"account_head": {
-									"account_name": "TVA due à l'importation",
-									"account_number": "4453",
-									"root_type": "Asset",
-									"tax_rate": 8.5
-								},
-								"description": "TVA à l'importation 8.5%",
-								"rate": 8.5,
-								"add_deduct_tax": "Deduct"
-							},
-							{
-								"account_head": {
-									"account_name": "TVA 8.5% Déductible",
-									"account_number": "445685",
-									"root_type": "Asset",
-									"tax_rate": 8.5
-								},
-								"description": "TVA 8.5% Déductible",
-								"rate": 8.5,
-								"add_deduct_tax": "Add"
-							}
-						]
-					},
                                        {
                                                 "title": "Services Métropole vers Réunion - TVA 8.5%",
                                                 "tax_category": "Achat Services - Métropole",

@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "naming_series:",
+ "creation": "2026-09-18 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "posting_date",
+  "purchase_invoice",
+  "purchase_receipt",
+  "import_reference",
+  "taxable_base",
+  "tax_rate",
+  "tax_due",
+  "deductible_tax",
+  "import_vat_due_account",
+  "deductible_tax_account",
+  "journal_entry",
+  "naming_series",
+  "amended_from"
+ ],
+ "fields": [
+  {"fieldname":"company","fieldtype":"Link","in_list_view":1,"label":"Company","options":"Company","reqd":1},
+  {"fieldname":"posting_date","fieldtype":"Date","in_list_view":1,"label":"Posting Date","reqd":1},
+  {"fieldname":"purchase_invoice","fieldtype":"Link","label":"Purchase Invoice","options":"Purchase Invoice"},
+  {"fieldname":"purchase_receipt","fieldtype":"Link","label":"Purchase Receipt","options":"Purchase Receipt"},
+  {"fieldname":"import_reference","fieldtype":"Data","in_list_view":1,"label":"Import Reference","reqd":1},
+  {"fieldname":"taxable_base","fieldtype":"Currency","label":"Import VAT Taxable Base","reqd":1},
+  {"fieldname":"tax_rate","fieldtype":"Percent","label":"Tax Rate","reqd":1},
+  {"fieldname":"tax_due","fieldtype":"Currency","label":"Import VAT Due","reqd":1},
+  {"fieldname":"deductible_tax","fieldtype":"Currency","label":"Deductible Import VAT","reqd":1},
+  {"fieldname":"import_vat_due_account","fieldtype":"Link","label":"Import VAT Due Account","options":"Account","reqd":1},
+  {"fieldname":"deductible_tax_account","fieldtype":"Link","label":"Deductible Tax Account","options":"Account","reqd":1},
+  {"fieldname":"journal_entry","fieldtype":"Link","label":"Generated Journal Entry","options":"Journal Entry","read_only":1},
+  {"fieldname":"naming_series","fieldtype":"Select","label":"Naming Series","options":"IM-VAT-.YYYY.-","reqd":1},
+  {"fieldname":"amended_from","fieldtype":"Link","label":"Amended From","no_copy":1,"options":"Import VAT Entry","read_only":1}
+ ],
+ "is_submittable": 1,
+ "module": "ERPNext France",
+ "name": "Import VAT Entry",
+ "naming_rule": "By \"Naming Series\" field",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"Accounts User","submit":1,"write":1},
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"Accounts Manager","submit":1,"write":1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

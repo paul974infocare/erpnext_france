@@ -98,12 +98,12 @@ fixtures = [
 					"Sales Invoice-is_down_payment_invoice",
 					"Sales Invoice-subscription",
 					"Sales Invoice-custom_do_not_calc_france_vat",
-                                        "Sales Invoice-custom_france_fiscal_legal_reference",
-                                        "Sales Invoice-custom_france_fiscal_invoice_mention",
-                                        "Sales Invoice-custom_france_fiscal_invoice_mention_html",
-                                        "Sales Invoice-custom_france_fiscal_mention_section",
-                                        "Tax Category-custom_france_fiscal_legal_reference",
-                                        "Tax Category-custom_france_fiscal_invoice_mention",
+					"Sales Invoice-custom_france_fiscal_legal_reference",
+					"Sales Invoice-custom_france_fiscal_invoice_mention",
+					"Sales Invoice-custom_france_fiscal_invoice_mention_html",
+					"Sales Invoice-custom_france_fiscal_mention_section",
+					"Tax Category-custom_france_fiscal_legal_reference",
+					"Tax Category-custom_france_fiscal_invoice_mention",
 					"Sales Invoice Advance-is_down_payment",
 					"Sales Invoice Item-down_payment_rate",
 					"Sales Invoice Item-is_down_payment_item",
@@ -393,7 +393,10 @@ doc_events = {
 	},
 	"Sales Order": {
 		"before_update_after_submit": "erpnext_france.controllers.sales_order.verify_sales_orders_terms",
-		"before_save": "erpnext_france.controllers.taxes.before_save",
+		"before_save": [
+			"erpnext_france.controllers.taxes.before_save",
+			"erpnext_france.controllers.sales_order.set_payment_schedule_before_invoice",
+		],
 	},
 	"Payment Entry": {
 		"on_trash": "erpnext_france.utils.transaction_log.check_deletion_permission",
@@ -410,7 +413,12 @@ doc_events = {
 	"Company": {"after_insert": "erpnext_france.setup.setup_company_default"},
 	"Item": {"on_update": "erpnext_france.controllers.item.on_update"},
 	"Item Price": {"on_update": "erpnext_france.controllers.item_price.before_save"},
-	"Quotation": {"before_save": "erpnext_france.controllers.taxes.before_save"},
+	"Quotation": {
+		"before_save": [
+			"erpnext_france.controllers.taxes.before_save",
+			"erpnext_france.controllers.sales_order.set_payment_schedule_before_invoice",
+		],
+	},
 	"System Settings": {
 		# "on_update": 'erpnext_france.install.after_wizard'
 	},
@@ -460,7 +468,7 @@ override_whitelisted_methods = {
 	"erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice": "erpnext_france.controllers.sales_order.make_sales_invoice_with_payment_terms",
 	"erpnext.selling.doctype.customer.customer.make_quotation": "erpnext_france.controllers.party.make_quotation_with_payment_terms",
 	"erpnext.accounts.party.get_due_date": "erpnext_france.controllers.party.get_due_date",
-    "erpnext.accounts.doctype.account.chart_of_accounts.chart_of_accounts.get_charts_for_country": "erpnext_france.erpnext_france.overrides.doctype.chart_of_accounts.get_charts_for_country_fr",
+	"erpnext.accounts.doctype.account.chart_of_accounts.chart_of_accounts.get_charts_for_country": "erpnext_france.erpnext_france.overrides.doctype.chart_of_accounts.get_charts_for_country_fr",
 }
 
 # Regional Overrides

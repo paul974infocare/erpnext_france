@@ -1,0 +1,39 @@
+{
+ "autoname": "hash",
+ "creation": "2026-09-22 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["tax_rate", "taxable_amount", "tax_amount"],
+ "fields": [
+  {
+   "fieldname": "tax_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Tax Rate",
+   "reqd": 1
+  },
+  {
+   "fieldname": "taxable_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Taxable Amount",
+   "options": "parent.currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Tax Amount",
+   "options": "parent.currency",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "module": "ERPNext France",
+ "name": "Down Payment Invoice Tax",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -830,7 +830,8 @@
 			"Fournisseurs et comptes rattach\u00e9s (ACTIF)": {
 				"409-Fournisseurs d\u00e9biteurs": {
 					"Fournisseurs - Avances et acomptes vers\u00e9s sur commandes": {
-						"account_number": "4091"
+						"account_number": "4091",
+						"account_type": "Payable"
 					},
 					"Fournisseurs - Cr\u00e9ances pour emballages et mat\u00e9riel \u00e0 rendre": {
 						"account_number": "4096"
@@ -1119,7 +1120,7 @@
 				"419-Clients cr\u00e9diteurs": {
 					"Clients - Avances et acomptes re\u00e7us sur commandes": {
 						"account_number": "4191",
-						"account_type": "Income Account"
+						"account_type": "Receivable"
 					},
 					"Clients - Dettes sur emballages et mat\u00e9riels consign\u00e9s": {
 						"account_number": "4196"

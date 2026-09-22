@@ -21,6 +21,9 @@
   "net_total",
   "total_taxes_and_charges",
   "grand_total",
+    "paid_amount",
+    "outstanding_amount",
+    "payment_status",
   "base_net_total",
   "base_total_taxes_and_charges",
   "base_grand_total",
@@ -133,6 +136,30 @@
    "options": "currency",
    "read_only": 1
   },
+    {
+    "fieldname": "paid_amount",
+     "fieldtype": "Currency",
+     "is_virtual": 1,
+     "label": "Amount Paid",
+     "options": "currency",
+     "read_only": 1
+    },
+    {
+    "fieldname": "outstanding_amount",
+     "fieldtype": "Currency",
+     "is_virtual": 1,
+     "label": "Amount Remaining",
+     "options": "currency",
+     "read_only": 1
+    },
+    {
+     "fieldname": "payment_status",
+     "fieldtype": "Select",
+     "is_virtual": 1,
+     "label": "Payment Status",
+     "options": "Unpaid\nPartly Paid\nPaid",
+     "read_only": 1
+    },
   {
    "fieldname": "base_net_total",
    "fieldtype": "Currency",

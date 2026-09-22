@@ -5,6 +5,58 @@ from frappe.utils import flt, getdate, today
 
 
 class DownPaymentInvoice(Document):
+    @property
+    def paid_amount(self):
+        if hasattr(self, "_paid_amount_cache"):
+            return self._paid_amount_cache
+
+        precision = self.precision("grand_total")
+        references = frappe.get_all(
+            "Payment Entry Reference",
+            filters={
+                "reference_doctype": "Sales Order",
+                "reference_name": self.sales_order,
+            },
+            fields=["parent", "allocated_amount"],
+        )
+        if not references:
+            self._paid_amount_cache = 0
+            return self._paid_amount_cache
+
+        payment_entries = frappe.get_all(
+            "Payment Entry",
+            filters={
+                "name": ["in", list({reference.get("parent") for reference in references})],
+                "down_payment_invoice": self.name,
+                "docstatus": 1,
+                "payment_type": "Receive",
+            },
+            fields=["name"],
+        )
+        submitted_payment_entries = {payment_entry.get("name") for payment_entry in payment_entries}
+        self._paid_amount_cache = flt(
+            sum(
+                flt(reference.get("allocated_amount"))
+                for reference in references
+                if reference.get("parent") in submitted_payment_entries
+            ),
+            precision,
+        )
+        return self._paid_amount_cache
+
+    @property
+    def outstanding_amount(self):
+        precision = self.precision("grand_total")
+        return flt(max(flt(self.grand_total) - self.paid_amount, 0), precision)
+
+    @property
+    def payment_status(self):
+        if self.paid_amount <= 0:
+            return "Unpaid"
+        if self.outstanding_amount <= 0:
+            return "Paid"
+        return "Partly Paid"
+
     def validate(self):
         self.validate_sales_order()
         self.validate_calculation_method()

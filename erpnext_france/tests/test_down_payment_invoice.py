@@ -2,7 +2,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 from unittest.mock import patch
 
-from erpnext_france.erpnext_france.erpnext_france.doctype.down_payment_invoice.down_payment_invoice import (
+from erpnext_france.erpnext_france.doctype.down_payment_invoice.down_payment_invoice import (
     DownPaymentInvoice,
     make_down_payment_invoice,
 )
@@ -78,3 +78,77 @@ class TestDownPaymentInvoice(FrappeTestCase):
         )
         self.assertFalse(frappe.db.exists("Payment Ledger Entry", {"voucher_type": "Down Payment Invoice", "voucher_no": name}))
         self.assertFalse(frappe.db.exists("Advance Payment Ledger Entry", {"voucher_type": "Down Payment Invoice", "voucher_no": name}))
+
+
+class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
+    def make_document(self, grand_total=325.5):
+        doc = frappe.new_doc("Down Payment Invoice")
+        doc.name = "DPI-TEST-0001"
+        doc.sales_order = "SO-TEST-0001"
+        doc.grand_total = grand_total
+        return doc
+
+    def mock_payment_data(self, references, payment_entries):
+        def get_all(doctype, **kwargs):
+            if doctype == "Payment Entry Reference":
+                return references
+            if doctype == "Payment Entry":
+                return payment_entries
+            return []
+
+        return patch.object(frappe, "get_all", side_effect=get_all)
+
+    def test_unpaid_without_payments(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data([], []):
+            self.assertEqual(doc.paid_amount, 0)
+            self.assertEqual(doc.outstanding_amount, 325.5)
+            self.assertEqual(doc.payment_status, "Unpaid")
+
+    def test_partly_paid(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [{"parent": "PE-TEST-0001", "allocated_amount": 100}],
+            [{"name": "PE-TEST-0001"}],
+        ):
+            self.assertEqual(doc.paid_amount, 100)
+            self.assertEqual(doc.outstanding_amount, 225.5)
+            self.assertEqual(doc.payment_status, "Partly Paid")
+
+    def test_paid_with_multiple_payments_and_references(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [
+                {"parent": "PE-TEST-0001", "allocated_amount": 100},
+                {"parent": "PE-TEST-0001", "allocated_amount": 25.5},
+                {"parent": "PE-TEST-0002", "allocated_amount": 200},
+                {"parent": "PE-TEST-0003", "allocated_amount": 325.5},
+            ],
+            [{"name": "PE-TEST-0001"}, {"name": "PE-TEST-0002"}],
+        ):
+            self.assertEqual(doc.paid_amount, 325.5)
+            self.assertEqual(doc.outstanding_amount, 0)
+            self.assertEqual(doc.payment_status, "Paid")
+
+    def test_query_filters_cancelled_entries_and_other_sales_orders(self):
+        doc = self.make_document()
+        calls = []
+
+        def get_all(doctype, **kwargs):
+            calls.append((doctype, kwargs["filters"]))
+            if doctype == "Payment Entry Reference":
+                self.assertEqual(kwargs["filters"]["reference_name"], doc.sales_order)
+                return [{"parent": "PE-TEST-0001", "allocated_amount": 100}]
+
+            self.assertEqual(kwargs["filters"]["down_payment_invoice"], doc.name)
+            self.assertEqual(kwargs["filters"]["docstatus"], 1)
+            self.assertEqual(kwargs["filters"]["payment_type"], "Receive")
+            return [{"name": "PE-TEST-0001"}]
+
+        with patch.object(frappe, "get_all", side_effect=get_all):
+            self.assertEqual(doc.paid_amount, 100)
+
+        self.assertEqual([call[0] for call in calls], ["Payment Entry Reference", "Payment Entry"])

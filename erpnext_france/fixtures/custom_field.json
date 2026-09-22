@@ -5763,5 +5763,19 @@
   "hidden": 0,
   "read_only": 0,
   "is_system_generated": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "Payment Entry",
+  "name": "Payment Entry-down_payment_invoice",
+  "fieldname": "down_payment_invoice",
+  "fieldtype": "Link",
+  "label": "Down Payment Invoice",
+  "insert_after": "down_payment",
+  "options": "Down Payment Invoice",
+  "print_hide": 0,
+  "hidden": 0,
+  "read_only": 0,
+  "is_system_generated": 0
  }
 ]

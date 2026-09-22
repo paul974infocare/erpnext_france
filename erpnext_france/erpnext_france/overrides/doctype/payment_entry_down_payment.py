@@ -21,6 +21,28 @@ class PaymentEntryDownPayment(PaymentEntry):
 				if cint(is_dp_invoice):
 					is_down_payment = True
 		self.down_payment = is_down_payment
+		self.validate_down_payment_invoice()
+
+	def validate_down_payment_invoice(self):
+		if not self.down_payment_invoice:
+			return
+
+		down_payment_invoice = frappe.get_doc("Down Payment Invoice", self.down_payment_invoice)
+		if down_payment_invoice.docstatus != 1:
+			frappe.throw(frappe._("Down Payment Invoice must be submitted"))
+
+		if down_payment_invoice.company != self.company:
+			frappe.throw(frappe._("Down Payment Invoice company must match Payment Entry company"))
+
+		if down_payment_invoice.customer != self.party:
+			frappe.throw(frappe._("Down Payment Invoice customer must match Payment Entry party"))
+
+		if not any(
+			reference.reference_doctype == "Sales Order"
+			and reference.reference_name == down_payment_invoice.sales_order
+			for reference in self.get("references")
+		):
+			frappe.throw(frappe._("Payment Entry references must contain the Down Payment Invoice Sales Order"))
 
 	def build_gl_map(self):
 		# Délègue la construction complète du GL map au core v16 (Advance Payment Ledger inclus),

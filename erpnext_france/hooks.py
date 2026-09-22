@@ -66,6 +66,7 @@ fixtures = [
 					"Party Account-advance_account",
 					"Party Account-subledger_account",
 					"Payment Entry-down_payment",
+					"Payment Entry-down_payment_invoice",
 					"Payment Entry-accounting_journal",
 					"Payment Entry-subscription",
 					"Payment Term-payment_terms_before_invoice",

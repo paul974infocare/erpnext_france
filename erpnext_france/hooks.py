@@ -54,6 +54,7 @@ fixtures = [
 					"Customer Group-tax_category",
 					"GL Entry-accounting_entry_number",
 					"GL Entry-accounting_journal",
+					"GL Entry-france_advance_vat_reference",
 					"GL Entry-export_date",
 					"Item-is_down_payment_item",
 					"Item-eco_part",
@@ -475,10 +476,14 @@ override_whitelisted_methods = {
 # Regional Overrides
 regional_overrides = {
 	"France": {
+		"erpnext.accounts.doctype.payment_entry.payment_entry.add_regional_gl_entries": "erpnext_france.erpnext_france.overrides.payment_entry.add_regional_gl_entries",
 		# "erpnext.controllers.taxes_and_totals.update_itemised_tax_data": "erpnext_france.controllers.taxes.update_itemised_tax_data",
 		# "erpnext.controllers.taxes_and_totals.get_itemised_tax_breakup_data": "erpnext_france.controllers.taxes.get_itemised_tax_breakup_data",
 		# "erpnext.controllers.taxes_and_totals.get_itemised_tax": "erpnext_france.regional.france.taxes.get_itemised_tax", #Not regionnalized
 		# "erpnext.accounts.controllers.accounts_controller.update_against_document_in_jv": "erpnext_france.controllers.accounts_controller.update_against_document_in_jv", #Not regionnalized
+	},
+	"Réunion": {
+		"erpnext.accounts.doctype.payment_entry.payment_entry.add_regional_gl_entries": "erpnext_france.erpnext_france.overrides.payment_entry.add_regional_gl_entries",
 	},
 }
 

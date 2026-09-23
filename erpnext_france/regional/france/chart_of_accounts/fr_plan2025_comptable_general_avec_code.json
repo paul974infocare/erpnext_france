@@ -961,6 +961,10 @@
 						"Acomptes - R\u00e9gime simplifi\u00e9 d'imposition": {
 							"account_number": "44581"
 						},
+						"TVA sur acomptes \u00e0 r\u00e9gulariser": {
+							"account_number": "44588",
+							"account_type": "Tax"
+						},
 						"Remboursement de taxes sur le chiffre d'affaires demand\u00e9": {
 							"account_number": "44583"
 						},

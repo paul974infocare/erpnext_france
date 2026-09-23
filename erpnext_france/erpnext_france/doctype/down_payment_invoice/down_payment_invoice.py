@@ -118,7 +118,7 @@ class DownPaymentInvoice(Document):
         net_total = 0
         total_taxes = 0
         tax_breakdown = self.get_tax_breakdown(sales_order)
-        for tax_rate, values in tax_breakdown.items():
+        for (tax_rate, tax_account), values in tax_breakdown.items():
             taxable_amount = flt(values["taxable_amount"] * factor, self.precision("net_total"))
             tax_amount = flt(values["tax_amount"] * factor, self.precision("total_taxes_and_charges"))
             net_total += taxable_amount
@@ -129,6 +129,7 @@ class DownPaymentInvoice(Document):
                     "tax_rate": tax_rate,
                     "taxable_amount": taxable_amount,
                     "tax_amount": tax_amount,
+                    "tax_account": tax_account,
                 },
             )
 
@@ -145,9 +146,11 @@ class DownPaymentInvoice(Document):
     @staticmethod
     def get_tax_breakdown(sales_order):
         breakdown = {}
+        tax_accounts = {tax_row.name: tax_row.account_head for tax_row in sales_order.get("taxes") or []}
         for detail in sales_order.get("item_wise_tax_details") or []:
             tax_rate = flt(detail.rate)
-            values = breakdown.setdefault(tax_rate, {"taxable_amount": 0, "tax_amount": 0})
+            tax_account = tax_accounts.get(detail.tax_row)
+            values = breakdown.setdefault((tax_rate, tax_account), {"taxable_amount": 0, "tax_amount": 0})
             values["taxable_amount"] += flt(detail.taxable_amount)
             values["tax_amount"] += flt(detail.amount)
 
@@ -161,13 +164,13 @@ class DownPaymentInvoice(Document):
                 else 0
             )
             return {
-                tax_rate: {
+                (tax_rate, None): {
                     "taxable_amount": flt(sales_order.net_total),
                     "tax_amount": flt(sales_order.total_taxes_and_charges),
                 }
             }
 
-        return {0: {"taxable_amount": flt(sales_order.net_total), "tax_amount": 0}}
+        return {(0, None): {"taxable_amount": flt(sales_order.net_total), "tax_amount": 0}}
 
 
 @frappe.whitelist()

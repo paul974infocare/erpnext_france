@@ -4,7 +4,7 @@
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
- "field_order": ["tax_rate", "taxable_amount", "tax_amount"],
+ "field_order": ["tax_rate", "taxable_amount", "tax_amount", "tax_account"],
  "fields": [
   {
    "fieldname": "tax_rate",
@@ -28,6 +28,13 @@
    "label": "Tax Amount",
    "options": "parent.currency",
    "read_only": 1
+   },
+   {
+    "fieldname": "tax_account",
+    "fieldtype": "Link",
+    "label": "Tax Account",
+    "options": "Account",
+    "read_only": 1
   }
  ],
  "istable": 1,

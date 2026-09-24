@@ -1,15 +1,12 @@
 # Copyright (c) 2023, Scopen and contributors
 # For license information, please see license.txt
 import frappe
-from erpnext import is_perpetual_inventory_enabled
 from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import (
 	SalesInvoice,
 	update_linked_doc,
 )
-from erpnext.accounts.doctype.tax_withholding_entry.tax_withholding_entry import SalesTaxWithholding
 from erpnext.accounts.party import get_party_account
-from erpnext.accounts.utils import get_account_currency
 from erpnext.controllers.accounts_controller import validate_account_head
 from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from frappe import _
@@ -157,67 +154,11 @@ class SalesInvoiceFrance(SalesInvoice):
 						]
 
 	def make_item_gl_entries(self, gl_entries):
-		# income account gl entries
-		enable_discount_accounting = cint(
-			frappe.db.get_single_value("Selling Settings", "enable_discount_accounting")
-		)
-
-		for item in self.get("items"):
-			if (
-				flt(item.base_net_amount, item.precision("base_net_amount"))
-				or item.is_fixed_asset
-				or enable_discount_accounting
-			):
-				# Do not book income for transfer within same company
-				if self.is_internal_transfer():
-					continue
-
-				if item.is_fixed_asset and item.asset:
-					self.get_gl_entries_for_fixed_asset(item, gl_entries)
-				else:
-					income_account = (
-						item.income_account
-						if (
-							not item.enable_deferred_revenue or self.is_return or self.is_down_payment_invoice
-						)
-						else item.deferred_revenue_account
-					)
-					amount, base_amount = self.get_amount_and_base_amount(item, enable_discount_accounting)
-
-					account_currency = get_account_currency(income_account)
-					gl_dict = self.get_gl_dict(
-						{
-							"account": income_account,
-							"against": self.customer,
-							"credit": flt(base_amount, item.precision("base_net_amount")),
-							"credit_in_account_currency": (
-								flt(base_amount, item.precision("base_net_amount"))
-								if account_currency == self.company_currency
-								else flt(amount, item.precision("net_amount"))
-							),
-							"credit_in_transaction_currency": flt(amount, item.precision("net_amount")),
-							"cost_center": item.cost_center,
-							"project": item.project or self.project,
-							"remarks": item.get("remarks")
-							or f'{_("Item")}: {item.qty} {item.item_code} - {_(item.uom)} / {_("Customer")}: {self.customer}',
-							"accounting_journal": self.accounting_journal,
-						},
-						account_currency,
-						item=item,
-					)
-
-					gl_entries.append(gl_dict)
-
-		# expense account gl entries
-		if cint(self.update_stock) and is_perpetual_inventory_enabled(self.company):
-			gl_entries += super(SalesInvoice, self).get_gl_entries()
-
-	def get_gl_entries_for_fixed_asset(self, item, gl_entries):
-		# Délègue à la méthode v16, puis injecte accounting_journal sur les entrées ajoutées
 		before = len(gl_entries)
-		super().get_gl_entries_for_fixed_asset(item, gl_entries)
-		for gle in gl_entries[before:]:
-			gle["accounting_journal"] = self.accounting_journal
+		super().make_item_gl_entries(gl_entries)
+
+		for gl_entry in gl_entries[before:]:
+			gl_entry.setdefault("accounting_journal", self.accounting_journal)
 
 	def validate_due_date(self):
 		if self.get("is_pos"):

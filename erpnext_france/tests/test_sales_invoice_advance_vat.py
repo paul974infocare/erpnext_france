@@ -180,6 +180,26 @@ class TestSalesInvoiceAdvanceVAT(unittest.TestCase):
 	def test_sales_invoice_france_uses_v16_submit(self):
 		self.assertIs(SalesInvoiceFrance.on_submit, SalesInvoice.on_submit)
 
+	def test_sales_invoice_france_item_gl_entries_delegate_and_set_journal(self):
+		doc = SalesInvoiceFrance.__new__(SalesInvoiceFrance)
+		doc.accounting_journal = "Sales Journal"
+		gl_entries = [{"accounting_journal": "Existing Journal"}]
+
+		def native_make_item_gl_entries(_self, entries):
+			entries.extend([{}, {"accounting_journal": "Native Journal"}])
+
+		with patch.object(SalesInvoice, "make_item_gl_entries", native_make_item_gl_entries):
+			SalesInvoiceFrance.make_item_gl_entries(doc, gl_entries)
+
+		self.assertEqual(
+			gl_entries,
+			[
+				{"accounting_journal": "Existing Journal"},
+				{"accounting_journal": "Sales Journal"},
+				{"accounting_journal": "Native Journal"},
+			],
+		)
+
 	def test_noop_without_payment_entry_advance(self):
 		gl_entries = [{"account": "4111", "debit": 100}]
 		result = make_regional_gl_entries(gl_entries, self.make_sales_invoice())

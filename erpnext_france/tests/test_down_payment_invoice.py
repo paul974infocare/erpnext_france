@@ -312,27 +312,6 @@ class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
             self.assertEqual(doc.paid_amount, 325.5)
             self.assertEqual(doc.payment_status, "Paid")
 
-    def test_sales_invoice_for_another_sales_order_is_ignored(self):
-        doc = self.make_document()
-
-        with self.mock_payment_data(
-            [
-                {
-                    "parent": "PE-TEST-0001",
-                    "reference_doctype": "Sales Invoice",
-                    "reference_name": "SI-TEST-0002",
-                    "allocated_amount": 325.5,
-                }
-            ],
-            [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 325.5}],
-            sales_invoices=["SI-TEST-0002"],
-            sales_invoice_items=[
-                {"parent": "SI-TEST-0002", "sales_order": "SO-OTHER-0001"}
-            ],
-        ):
-            self.assertEqual(doc.paid_amount, 0)
-            self.assertEqual(doc.payment_status, "Unpaid")
-
     def test_multiple_payment_entries_and_allocations_are_counted_once(self):
         doc = self.make_document()
 

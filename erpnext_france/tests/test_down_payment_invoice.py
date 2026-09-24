@@ -164,12 +164,54 @@ class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
         doc.grand_total = grand_total
         return doc
 
-    def mock_payment_data(self, references, payment_entries):
+    def mock_payment_data(
+        self, references, payment_entries, sales_invoices=None, sales_invoice_items=None
+    ):
+        payment_entries = [
+            frappe._dict(
+                {
+                    "name": entry if isinstance(entry, str) else entry["name"],
+                    "down_payment_invoice_amount": 0
+                    if isinstance(entry, str)
+                    else entry.get("down_payment_invoice_amount", 0),
+                    "docstatus": 1 if isinstance(entry, str) else entry.get("docstatus", 1),
+                    "payment_type": "Receive" if isinstance(entry, str) else entry.get("payment_type", "Receive"),
+                    "company": "Company 1" if isinstance(entry, str) else entry.get("company", "Company 1"),
+                    "party_type": "Customer" if isinstance(entry, str) else entry.get("party_type", "Customer"),
+                    "party": "Customer 1" if isinstance(entry, str) else entry.get("party", "Customer 1"),
+                }
+            )
+            for entry in payment_entries
+        ]
+        sales_invoices = sales_invoices or []
+        sales_invoice_items = sales_invoice_items or []
+
         def get_all(doctype, **kwargs):
+            if doctype == "Payment Entry":
+                return [
+                    entry
+                    for entry in payment_entries
+                    if entry.docstatus == 1
+                    and entry.payment_type == "Receive"
+                    and entry.company == "Company 1"
+                    and entry.party_type == "Customer"
+                    and entry.party == "Customer 1"
+                ]
             if doctype == "Payment Entry Reference":
                 return references
-            if doctype == "Payment Entry":
-                return payment_entries
+            if doctype == "Sales Invoice":
+                names = {
+                    invoice if isinstance(invoice, str) else invoice["name"]
+                    for invoice in sales_invoices
+                }
+                return list(names.intersection(kwargs["filters"]["name"][1]))
+            if doctype == "Sales Invoice Item":
+                return [
+                    item
+                    for item in sales_invoice_items
+                    if item["parent"] in kwargs["filters"]["parent"][1]
+                    and item["sales_order"] == kwargs["filters"]["sales_order"]
+                ]
             return []
 
         return patch.object(frappe, "get_all", side_effect=get_all)
@@ -186,8 +228,15 @@ class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
         doc = self.make_document()
 
         with self.mock_payment_data(
-            [{"parent": "PE-TEST-0001", "allocated_amount": 100}],
-            [{"name": "PE-TEST-0001"}],
+            [
+                {
+                    "parent": "PE-TEST-0001",
+                    "reference_doctype": "Sales Order",
+                    "reference_name": "SO-TEST-0001",
+                    "allocated_amount": 100,
+                }
+            ],
+            [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 100}],
         ):
             self.assertEqual(doc.paid_amount, 100)
             self.assertEqual(doc.outstanding_amount, 225.5)
@@ -198,12 +247,15 @@ class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
 
         with self.mock_payment_data(
             [
-                {"parent": "PE-TEST-0001", "allocated_amount": 100},
-                {"parent": "PE-TEST-0001", "allocated_amount": 25.5},
-                {"parent": "PE-TEST-0002", "allocated_amount": 200},
-                {"parent": "PE-TEST-0003", "allocated_amount": 325.5},
+                {"parent": "PE-TEST-0001", "reference_doctype": "Sales Order", "reference_name": "SO-TEST-0001", "allocated_amount": 100},
+                {"parent": "PE-TEST-0001", "reference_doctype": "Sales Order", "reference_name": "SO-TEST-0001", "allocated_amount": 25.5},
+                {"parent": "PE-TEST-0002", "reference_doctype": "Sales Order", "reference_name": "SO-TEST-0001", "allocated_amount": 200},
+                {"parent": "PE-TEST-0003", "reference_doctype": "Sales Order", "reference_name": "SO-TEST-0001", "allocated_amount": 325.5},
             ],
-            [{"name": "PE-TEST-0001"}, {"name": "PE-TEST-0002"}],
+            [
+                {"name": "PE-TEST-0001", "down_payment_invoice_amount": 125.5},
+                {"name": "PE-TEST-0002", "down_payment_invoice_amount": 200},
+            ],
         ):
             self.assertEqual(doc.paid_amount, 325.5)
             self.assertEqual(doc.outstanding_amount, 0)
@@ -215,16 +267,120 @@ class TestDownPaymentInvoicePaymentStatus(FrappeTestCase):
 
         def get_all(doctype, **kwargs):
             calls.append((doctype, kwargs["filters"]))
-            if doctype == "Payment Entry Reference":
-                self.assertEqual(kwargs["filters"]["reference_name"], doc.sales_order)
-                return [{"parent": "PE-TEST-0001", "allocated_amount": 100}]
-
-            self.assertEqual(kwargs["filters"]["down_payment_invoice"], doc.name)
-            self.assertEqual(kwargs["filters"]["docstatus"], 1)
-            self.assertEqual(kwargs["filters"]["payment_type"], "Receive")
-            return [{"name": "PE-TEST-0001"}]
+            if doctype == "Payment Entry":
+                self.assertEqual(kwargs["filters"]["down_payment_invoice"], doc.name)
+                self.assertEqual(kwargs["filters"]["docstatus"], 1)
+                self.assertEqual(kwargs["filters"]["payment_type"], "Receive")
+                self.assertEqual(kwargs["filters"]["company"], doc.company)
+                self.assertEqual(kwargs["filters"]["party"], doc.customer)
+                return [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 100}]
+            self.fail(f"Unexpected query for {doctype}")
 
         with patch.object(frappe, "get_all", side_effect=get_all):
             self.assertEqual(doc.paid_amount, 100)
 
-        self.assertEqual([call[0] for call in calls], ["Payment Entry Reference", "Payment Entry"])
+        self.assertEqual([call[0] for call in calls], ["Payment Entry"])
+
+    def test_relinked_payment_to_sales_invoice_for_same_sales_order_stays_paid(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [
+                {
+                    "parent": "PE-TEST-0001",
+                    "reference_doctype": "Sales Invoice",
+                    "reference_name": "SI-TEST-0001",
+                    "allocated_amount": 325.5,
+                }
+            ],
+            [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 325.5}],
+            sales_invoices=["SI-TEST-0001"],
+            sales_invoice_items=[
+                {"parent": "SI-TEST-0001", "sales_order": "SO-TEST-0001"}
+            ],
+        ):
+            self.assertEqual(doc.paid_amount, 325.5)
+            self.assertEqual(doc.payment_status, "Paid")
+
+    def test_snapshot_keeps_dpi_paid_when_payment_entry_references_are_removed(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [],
+            [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 325.5}],
+        ):
+            self.assertEqual(doc.paid_amount, 325.5)
+            self.assertEqual(doc.payment_status, "Paid")
+
+    def test_sales_invoice_for_another_sales_order_is_ignored(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [
+                {
+                    "parent": "PE-TEST-0001",
+                    "reference_doctype": "Sales Invoice",
+                    "reference_name": "SI-TEST-0002",
+                    "allocated_amount": 325.5,
+                }
+            ],
+            [{"name": "PE-TEST-0001", "down_payment_invoice_amount": 325.5}],
+            sales_invoices=["SI-TEST-0002"],
+            sales_invoice_items=[
+                {"parent": "SI-TEST-0002", "sales_order": "SO-OTHER-0001"}
+            ],
+        ):
+            self.assertEqual(doc.paid_amount, 0)
+            self.assertEqual(doc.payment_status, "Unpaid")
+
+    def test_multiple_payment_entries_and_allocations_are_counted_once(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [
+                {
+                    "parent": "PE-TEST-0001",
+                    "reference_doctype": "Sales Order",
+                    "reference_name": "SO-TEST-0001",
+                    "allocated_amount": 100,
+                },
+                {
+                    "parent": "PE-TEST-0001",
+                    "reference_doctype": "Sales Order",
+                    "reference_name": "SO-TEST-0001",
+                    "allocated_amount": 25.5,
+                },
+                {
+                    "parent": "PE-TEST-0002",
+                    "reference_doctype": "Sales Invoice",
+                    "reference_name": "SI-TEST-0001",
+                    "allocated_amount": 200,
+                },
+            ],
+            [
+                {"name": "PE-TEST-0001", "down_payment_invoice_amount": 125.5},
+                {"name": "PE-TEST-0002", "down_payment_invoice_amount": 200},
+            ],
+            sales_invoices=["SI-TEST-0001"],
+            sales_invoice_items=[
+                {"parent": "SI-TEST-0001", "sales_order": "SO-TEST-0001"}
+            ],
+        ):
+            self.assertEqual(doc.paid_amount, 325.5)
+
+    def test_cancelled_payment_entry_is_ignored(self):
+        doc = self.make_document()
+
+        with self.mock_payment_data(
+            [
+                {
+                    "parent": "PE-TEST-CANCELLED",
+                    "reference_doctype": "Sales Order",
+                    "reference_name": "SO-TEST-0001",
+                    "allocated_amount": 325.5,
+                }
+            ],
+            [{"name": "PE-TEST-CANCELLED", "docstatus": 2}],
+        ):
+            self.assertEqual(doc.paid_amount, 0)
+            self.assertEqual(doc.payment_status, "Unpaid")

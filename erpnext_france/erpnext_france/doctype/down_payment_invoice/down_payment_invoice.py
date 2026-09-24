@@ -11,35 +11,20 @@ class DownPaymentInvoice(Document):
             return self._paid_amount_cache
 
         precision = self.precision("grand_total")
-        references = frappe.get_all(
-            "Payment Entry Reference",
-            filters={
-                "reference_doctype": "Sales Order",
-                "reference_name": self.sales_order,
-            },
-            fields=["parent", "allocated_amount"],
-        )
-        if not references:
-            self._paid_amount_cache = 0
-            return self._paid_amount_cache
-
         payment_entries = frappe.get_all(
             "Payment Entry",
             filters={
-                "name": ["in", list({reference.get("parent") for reference in references})],
                 "down_payment_invoice": self.name,
                 "docstatus": 1,
                 "payment_type": "Receive",
+                "company": self.company,
+                "party_type": "Customer",
+                "party": self.customer,
             },
-            fields=["name"],
+            fields=["down_payment_invoice_amount"],
         )
-        submitted_payment_entries = {payment_entry.get("name") for payment_entry in payment_entries}
         self._paid_amount_cache = flt(
-            sum(
-                flt(reference.get("allocated_amount"))
-                for reference in references
-                if reference.get("parent") in submitted_payment_entries
-            ),
+            sum(flt(payment_entry.get("down_payment_invoice_amount")) for payment_entry in payment_entries),
             precision,
         )
         return self._paid_amount_cache

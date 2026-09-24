@@ -3,7 +3,7 @@
 
 import frappe
 from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
-from frappe.utils import cint
+from frappe.utils import cint, flt
 
 
 class PaymentEntryDownPayment(PaymentEntry):
@@ -43,6 +43,23 @@ class PaymentEntryDownPayment(PaymentEntry):
 			for reference in self.get("references")
 		):
 			frappe.throw(frappe._("Payment Entry references must contain the Down Payment Invoice Sales Order"))
+
+		self._snapshot_down_payment_invoice_amount(down_payment_invoice)
+
+	def _snapshot_down_payment_invoice_amount(self, down_payment_invoice):
+		if self.docstatus != 0 and not self.is_new():
+			return
+
+		precision = self.precision("down_payment_invoice_amount")
+		self.down_payment_invoice_amount = flt(
+			sum(
+				flt(reference.allocated_amount)
+				for reference in self.get("references")
+				if reference.reference_doctype == "Sales Order"
+				and reference.reference_name == down_payment_invoice.sales_order
+			),
+			precision,
+		)
 
 	def build_gl_map(self):
 		# Délègue la construction complète du GL map au core v16 (Advance Payment Ledger inclus),

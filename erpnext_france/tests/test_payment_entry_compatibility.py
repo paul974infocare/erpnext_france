@@ -68,3 +68,44 @@ class TestPaymentEntryDownPaymentInvoice(FrappeTestCase):
         with patch.object(frappe, "get_doc", return_value=down_payment_invoice):
             with self.assertRaises(frappe.ValidationError):
                 PaymentEntryDownPayment.validate_down_payment_invoice(payment_entry)
+
+    def test_snapshots_only_the_down_payment_sales_order_allocation(self):
+        payment_entry = self.make_payment_entry()
+        payment_entry.references[0].allocated_amount = 100
+        payment_entry.append(
+            "references",
+            {
+                "reference_doctype": "Sales Order",
+                "reference_name": "SO-OTHER-0001",
+                "allocated_amount": 225.5,
+            },
+        )
+        down_payment_invoice = self.make_down_payment_invoice()
+
+        with (
+            patch.object(frappe, "get_doc", return_value=down_payment_invoice),
+            patch.object(payment_entry, "precision", return_value=2),
+        ):
+            PaymentEntryDownPayment.validate_down_payment_invoice(payment_entry)
+
+        self.assertEqual(payment_entry.down_payment_invoice_amount, 100)
+
+    def test_snapshot_is_not_recalculated_after_submission(self):
+        payment_entry = self.make_payment_entry()
+        payment_entry.references[0].allocated_amount = 325.5
+        down_payment_invoice = self.make_down_payment_invoice()
+
+        with (
+            patch.object(frappe, "get_doc", return_value=down_payment_invoice),
+            patch.object(payment_entry, "precision", return_value=2),
+        ):
+            PaymentEntryDownPayment.validate_down_payment_invoice(payment_entry)
+
+        payment_entry.docstatus = 1
+        payment_entry.set("__islocal", False)
+        payment_entry.references = []
+        PaymentEntryDownPayment._snapshot_down_payment_invoice_amount(
+            payment_entry, down_payment_invoice
+        )
+
+        self.assertEqual(payment_entry.down_payment_invoice_amount, 325.5)

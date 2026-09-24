@@ -68,6 +68,7 @@ fixtures = [
 					"Party Account-subledger_account",
 					"Payment Entry-down_payment",
 					"Payment Entry-down_payment_invoice",
+					"Payment Entry-down_payment_invoice_amount",
 					"Payment Entry-accounting_journal",
 					"Payment Entry-subscription",
 					"Payment Term-payment_terms_before_invoice",
@@ -477,6 +478,7 @@ override_whitelisted_methods = {
 regional_overrides = {
 	"France": {
 		"erpnext.accounts.doctype.payment_entry.payment_entry.add_regional_gl_entries": "erpnext_france.erpnext_france.overrides.payment_entry.add_regional_gl_entries",
+		"erpnext.accounts.doctype.sales_invoice.sales_invoice.make_regional_gl_entries": "erpnext_france.erpnext_france.overrides.sales_invoice_advance_vat.make_regional_gl_entries",
 		# "erpnext.controllers.taxes_and_totals.update_itemised_tax_data": "erpnext_france.controllers.taxes.update_itemised_tax_data",
 		# "erpnext.controllers.taxes_and_totals.get_itemised_tax_breakup_data": "erpnext_france.controllers.taxes.get_itemised_tax_breakup_data",
 		# "erpnext.controllers.taxes_and_totals.get_itemised_tax": "erpnext_france.regional.france.taxes.get_itemised_tax", #Not regionnalized
@@ -484,6 +486,7 @@ regional_overrides = {
 	},
 	"Réunion": {
 		"erpnext.accounts.doctype.payment_entry.payment_entry.add_regional_gl_entries": "erpnext_france.erpnext_france.overrides.payment_entry.add_regional_gl_entries",
+		"erpnext.accounts.doctype.sales_invoice.sales_invoice.make_regional_gl_entries": "erpnext_france.erpnext_france.overrides.sales_invoice_advance_vat.make_regional_gl_entries",
 	},
 }
 

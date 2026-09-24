@@ -8,7 +8,6 @@ from erpnext.accounts.doctype.sales_invoice.sales_invoice import (
 	update_linked_doc,
 )
 from erpnext.accounts.doctype.tax_withholding_entry.tax_withholding_entry import SalesTaxWithholding
-from erpnext.accounts.general_ledger import merge_similar_entries
 from erpnext.accounts.party import get_party_account
 from erpnext.accounts.utils import get_account_currency
 from erpnext.controllers.accounts_controller import validate_account_head
@@ -244,32 +243,6 @@ class SalesInvoiceFrance(SalesInvoice):
 						gl_entry["debit_in_account_currency"] += down_payment_entry[
 							"credit_in_account_currency"
 						]
-
-	def get_gl_entries(self, inventory_account_map=None):
-		gl_entries = []
-
-		self.make_customer_gl_entry(gl_entries)
-
-		self.make_tax_gl_entries(gl_entries)
-		self.make_internal_transfer_gl_entries(gl_entries)
-
-		self.make_item_gl_entries(gl_entries)
-		self.make_precision_loss_gl_entry(gl_entries)
-		self.make_discount_gl_entries(gl_entries)
-
-		self.make_down_payment_final_invoice_entries(gl_entries)
-
-		# merge gl entries before adding pos entries
-		gl_entries = merge_similar_entries(gl_entries)
-
-		self.make_loyalty_point_redemption_gle(gl_entries)
-		self.make_pos_gl_entries(gl_entries)
-
-		self.make_write_off_gl_entry(gl_entries)
-		self.make_gle_for_rounding_adjustment(gl_entries)
-		self.set_transaction_currency_and_rate_in_gl_map(gl_entries)
-
-		return gl_entries
 
 	def make_item_gl_entries(self, gl_entries):
 		# income account gl entries

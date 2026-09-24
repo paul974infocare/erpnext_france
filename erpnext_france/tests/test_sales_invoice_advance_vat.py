@@ -177,6 +177,9 @@ class TestSalesInvoiceAdvanceVAT(unittest.TestCase):
 		regional_hook.assert_called_once_with([], doc)
 		self.assertEqual(result, [{"regional": doc}])
 
+	def test_sales_invoice_france_uses_v16_submit(self):
+		self.assertIs(SalesInvoiceFrance.on_submit, SalesInvoice.on_submit)
+
 	def test_noop_without_payment_entry_advance(self):
 		gl_entries = [{"account": "4111", "debit": 100}]
 		result = make_regional_gl_entries(gl_entries, self.make_sales_invoice())

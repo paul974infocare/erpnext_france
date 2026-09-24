@@ -15,15 +15,6 @@ frappe.ui.form.on("Sales Order", "refresh", async function (frm) {
       },
     };
   });
-  if (frm.doc.docstatus == 1) {
-    frm.add_custom_button(
-      __("Down Payment Invoice"),
-      () => {
-        display_dialog_create_down_payment_invoice(frm);
-      },
-      __("Create")
-    );
-  }
   await prevent_term_modification_if_payment_exist(frm);
 });
 
@@ -81,59 +72,5 @@ async function prevent_term_modification_if_payment_exist(frm) {
         grid_row.doc.name
       );
     }
-  }
-}
-
-const display_dialog_create_down_payment_invoice = function (frm) {
-  let d = new frappe.ui.Dialog({
-    title: "Enter details",
-    fields: [
-      {
-        label: __("Down Payment Type"),
-        fieldname: "down_payment_type",
-        fieldtype: "Select",
-        options: "ByAmount\nByPercent",
-        reqd: 1,
-      },
-      {
-        label: __("Down Payment Value"),
-        fieldname: "down_payment_value",
-        fieldtype: "Currency",
-        reqd: 1,
-      },
-    ],
-    size: "small", // small, large, extra-large
-    primary_action_label: __("Create Down Payment"),
-    async primary_action(values) {
-      await init_document(frm, values);
-      d.hide();
-    },
-  });
-
-  d.show();
-};
-
-async function init_document(frm, values) {
-  try {
-    const response = await frappe.call({
-      method:
-        "erpnext_france.controllers.down_payment_invoice.init_down_payment_invoice",
-      freeze: true,
-      args: {
-        order_name: frm.doc.name,
-        values: values,
-      },
-    });
-
-    if (response.message) {
-      let new_doc_name = response.message;
-      frappe.set_route("Form", "Sales Invoice", new_doc_name);
-    }
-  } catch (error) {
-    frappe.msgprint({
-      title: __("Error"),
-      indicator: "red",
-      message: __("An error occurred while initializing the document."),
-    });
   }
 }

@@ -40,6 +40,18 @@ class TestPaymentEntryDownPaymentInvoice(FrappeTestCase):
         with patch.object(frappe, "get_doc", return_value=down_payment_invoice):
             PaymentEntryDownPayment.validate_down_payment_invoice(payment_entry)
 
+    def test_validation_does_not_detect_legacy_sales_invoice_down_payment(self):
+        payment_entry = self.make_payment_entry()
+        down_payment_invoice = self.make_down_payment_invoice()
+
+        with (
+            patch.object(frappe, "get_doc", return_value=down_payment_invoice),
+            patch.object(frappe.db, "get_value") as get_value,
+        ):
+            PaymentEntryDownPayment.validate_down_payment_invoice(payment_entry)
+
+        get_value.assert_not_called()
+
     def test_requires_submitted_down_payment_invoice(self):
         payment_entry = self.make_payment_entry()
         down_payment_invoice = self.make_down_payment_invoice(docstatus=0)

@@ -1,16 +1,9 @@
 # Copyright (c) 2023, Scopen and contributors
 # For license information, please see license.txt
 import frappe
-from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
-from erpnext.accounts.doctype.sales_invoice.sales_invoice import (
-	SalesInvoice,
-	update_linked_doc,
-)
-from erpnext.accounts.party import get_party_account
+from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
 from erpnext.controllers.accounts_controller import validate_account_head
-from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from frappe import _
-from frappe.utils import cint, flt
 
 class SalesInvoiceFrance(SalesInvoice):
 	def _validate(self):
@@ -34,14 +27,6 @@ class SalesInvoiceFrance(SalesInvoice):
 	def validate(self):
 		super().validate()
 
-		if (
-			cint(self.is_down_payment_invoice)
-			and len(list(set([x.sales_order for x in self.get("items")]))) > 1
-		):
-			frappe.throw(_("Down payment invoices can only be made against a single sales order."))
-
-		self.validate_down_payment_advances()
-
 		for item in self.get("items"):
 			validate_account_head(
 				item.idx,
@@ -49,109 +34,6 @@ class SalesInvoiceFrance(SalesInvoice):
 				self.company,
 				_("Income", context="Account Validation"),
 			)
-
-	def validate_down_payment_advances(self):
-		for advance in self.get("advances"):
-			if (
-				flt(advance.allocated_amount) <= flt(advance.advance_amount)
-				and advance.reference_type == "Payment Entry"
-				and cint(advance.is_down_payment)
-			):
-				advance.allocated_amount = advance.advance_amount
-
-	def make_down_payment_final_invoice_entries(self, gl_entries):
-		tva_accounting_on_down_payment = cint(
-			frappe.db.get_single_value("ERPNext France Settings", "tva_accounting_on_down_payment")
-		)
-		if tva_accounting_on_down_payment:
-			# Avec TVA sur acompte, les montants HT/taxes sont déjà nets au niveau
-			# des items (ligne ACOMPTE négative) et de taxes.py. Aucun ajustement
-			# GL supplémentaire n'est nécessaire ici.
-			return
-
-		# In the case of a down payment with multiple payments, associated entries of
-		# the gl_entries list would be credited/debited multiple times if we didn't make
-		# sure that the pair of GL Entry was not already processed.
-		handled_down_payment_entries: set[str] = set()
-
-		for d in self.get("advances"):
-			if (
-				flt(d.allocated_amount) <= 0
-				or d.reference_type != "Payment Entry"
-				or not cint(d.is_down_payment)
-			):
-				continue
-
-			payment_entry = frappe.get_doc(d.reference_type, d.reference_name)
-			down_payment_entries = []
-			gl_entry = frappe.qb.DocType("GL Entry")
-
-			for ref in payment_entry.references:
-				down_payment_entries.extend(
-					(
-						frappe.qb.from_(gl_entry)
-						.select(
-							"name",
-							"account",
-							"against",
-							"debit",
-							"debit_in_account_currency",
-							"credit",
-							"credit_in_account_currency",
-						)
-						.where(gl_entry.voucher_type == ref.reference_doctype)
-						.where(gl_entry.voucher_no == ref.reference_name)
-						.where(gl_entry.is_cancelled == 0)
-						.for_update()
-					).run(as_dict=1)
-				)
-
-			down_payment_accounts = [
-				entry["against"] for entry in down_payment_entries if entry["account"] == self.debit_to
-			]
-
-			for down_payment_entry in down_payment_entries:
-				if down_payment_entry["account"] in down_payment_accounts and not [
-					x for x in gl_entries if x["account"] == down_payment_entry["account"]
-				]:
-					gl_entries.append(
-						self.get_gl_dict(
-							{
-								"account": down_payment_entry["account"],
-								"against": down_payment_entry["account"],
-								"party_type": "Customer",
-								"party": self.customer,
-								"accounting_journal": self.accounting_journal,
-							},
-							self.currency,
-						)
-					)
-
-			for down_payment_entry in down_payment_entries:
-				if down_payment_entry["name"] in handled_down_payment_entries:
-					# Skip this down payment entry if it has already been handled,
-					# possibly for a previous payment entry.
-					continue
-
-				handled_down_payment_entries.add(down_payment_entry["name"])
-
-				for gl_entry in gl_entries:
-					if gl_entry["account"] != down_payment_entry["account"]:
-						continue
-					if gl_entry["account"] not in down_payment_accounts:
-						gl_entry["debit"] -= down_payment_entry["debit"]
-						gl_entry["debit_in_account_currency"] -= down_payment_entry[
-							"debit_in_account_currency"
-						]
-						gl_entry["credit"] -= down_payment_entry["credit"]
-						gl_entry["credit_in_account_currency"] -= down_payment_entry[
-							"credit_in_account_currency"
-						]
-					else:
-						gl_entry["debit"] += down_payment_entry["credit"]
-						gl_entry["debit_in_account_currency"] += down_payment_entry[
-							"credit_in_account_currency"
-						]
 
 	def make_item_gl_entries(self, gl_entries):
 		before = len(gl_entries)

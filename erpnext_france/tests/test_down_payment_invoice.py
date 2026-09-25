@@ -31,6 +31,7 @@ class TestDownPaymentInvoice(FrappeTestCase):
     def test_by_amount(self):
         doc = make_down_payment_invoice(self.sales_order.name, "ByAmount", 325.5)
 
+        self.assertEqual(doc.doctype, "Down Payment Invoice")
         self.assertEqual(doc.advance_amount, 325.5)
         self.assertEqual(doc.net_total, 300)
         self.assertEqual(doc.total_taxes_and_charges, 25.5)

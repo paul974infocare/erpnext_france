@@ -3,24 +3,12 @@
 
 import frappe
 from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
-from frappe.utils import cint, flt
+from frappe.utils import flt
 
 
 class PaymentEntryDownPayment(PaymentEntry):
 	def validate(self):
 		super().validate()
-		self.check_if_down_payment()
-
-	def check_if_down_payment(self):
-		is_down_payment = False
-		for d in self.get("references"):
-			if d.reference_doctype == "Sales Invoice":
-				is_dp_invoice = frappe.db.get_value(
-					d.reference_doctype, d.reference_name, "is_down_payment_invoice"
-				)
-				if cint(is_dp_invoice):
-					is_down_payment = True
-		self.down_payment = is_down_payment
 		self.validate_down_payment_invoice()
 
 	def validate_down_payment_invoice(self):

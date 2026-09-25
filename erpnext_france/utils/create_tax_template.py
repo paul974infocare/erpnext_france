@@ -33,7 +33,42 @@ def create_tax_template(doc: str):
 
 	from_detailed_data(company_name, country_wise_tax)
 	apply_fiscal_metadata(country_wise_tax)
+	create_tax_rules(company_name, country_wise_tax)
 	update_regional_tax_settings(country, company_name)
+
+
+def create_tax_rules(company_name: str, country_wise_tax: dict):
+	for rule in country_wise_tax.get("tax_rules", []):
+		tax_type = rule["tax_type"]
+		tax_category = rule["tax_category"]
+		tax_template_title = rule["tax_template"]
+		template_doctype = f"{tax_type} Taxes and Charges Template"
+
+		templates = frappe.get_all(
+			template_doctype,
+			filters={"company": company_name, "tax_category": tax_category},
+			fields=["name", "title"],
+		)
+		if len(templates) != 1 or templates[0]["title"] != tax_template_title:
+			continue
+
+		tax_rule_filters = {
+			"company": company_name,
+			"tax_type": tax_type,
+			"tax_category": tax_category,
+			"sales_tax_template": templates[0]["name"] if tax_type == "Sales" else None,
+			"purchase_tax_template": templates[0]["name"] if tax_type == "Purchase" else None,
+		}
+		if frappe.db.exists("Tax Rule", tax_rule_filters):
+			continue
+
+		frappe.get_doc(
+			{
+				"doctype": "Tax Rule",
+				**tax_rule_filters,
+				"priority": 1,
+			}
+		).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
 
 def apply_fiscal_metadata(country_wise_tax: dict):

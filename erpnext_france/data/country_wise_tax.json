@@ -337,6 +337,23 @@
 		                "invoice_mention": "Exonération de TVA en application des articles 294 du Code général des impôts (CGI) et L211-7 du Code des Impositions sur les Biens et Services (CIBS)"
 		        }
 		},
+		"tax_rules": [
+			{
+				"tax_type": "Sales",
+				"tax_category": "Vente Biens - Métropole",
+				"tax_template": "Export Biens Réunion vers Métropole"
+			},
+			{
+				"tax_type": "Sales",
+				"tax_category": "Vente Services - Métropole",
+				"tax_template": "Services Réunion vers Métropole - TVA 20%"
+			},
+			{
+				"tax_type": "Purchase",
+				"tax_category": "Achat Services - Métropole",
+				"tax_template": "Services Métropole vers Réunion - TVA 8.5%"
+			}
+		],
 		"chart_of_accounts": {
 			"Plan Comptable Général": {
 				"sales_tax_templates": [

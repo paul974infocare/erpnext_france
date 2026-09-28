@@ -10,6 +10,15 @@ from frappe.desk.page.setup_wizard.setup_wizard import make_records
 from frappe.exceptions import DoesNotExistError
 from frappe.utils import cint
 
+SUPPORTED_ACCOUNTING_COUNTRIES = (
+	"France",
+	"Guadeloupe",
+	"Martinique",
+	"French Guiana",
+	"Réunion",
+	"Mayotte",
+)
+
 
 @frappe.whitelist(allow_guest=False)
 def make_payment_terms_fixtures():
@@ -65,15 +74,10 @@ def setup_wizard_complete(args, action=None):
 
 
 def setup_company_default(company, action):
-    if company.country not in (
-        "France",
-        "Guadeloupe",
-        "Martinique",
-        "French Guiana",
-        "Réunion",
-        "Mayotte",
-    ):
+    if company.country not in SUPPORTED_ACCOUNTING_COUNTRIES:
         return
+
+    set_french_accounting_settings()
 
     if not frappe.db.sql(
         """select name
@@ -105,6 +109,11 @@ def setup_company_default(company, action):
     set_default_accounting_journal(company.company_name, company.abbr)
 
     frappe.local.flags.ignore_chart_of_accounts = True
+
+
+def set_french_accounting_settings():
+	frappe.db.set_single_value("Accounts Settings", "enable_immutable_ledger", 1)
+	frappe.db.set_single_value("Accounts Settings", "delete_linked_ledger_entries", 0)
 
 
 def default_accounts_mapping(accounts):

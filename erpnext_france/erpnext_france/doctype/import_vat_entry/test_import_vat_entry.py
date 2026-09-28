@@ -111,11 +111,19 @@ class TestImportVATEntry(FrappeTestCase):
 		journal_entry = entry.journal_entry
 		entry.cancel()
 		self.assertEqual(frappe.db.get_value("Journal Entry", journal_entry, "docstatus"), 2)
-		self.assertTrue(
-			frappe.db.exists(
-				"GL Entry", {"voucher_type": "Journal Entry", "voucher_no": journal_entry, "is_cancelled": 1}
-			)
+		lines = frappe.get_all(
+			"GL Entry",
+			filters={"voucher_type": "Journal Entry", "voucher_no": journal_entry},
+			fields=["account", "debit", "credit"],
 		)
+		self.assertTrue(lines)
+
+		net_by_account = {}
+		for line in lines:
+			net_by_account.setdefault(line.account, 0)
+			net_by_account[line.account] += flt(line.debit) - flt(line.credit)
+
+		self.assertTrue(all(flt(net) == 0 for net in net_by_account.values()))
 
 	def test_tax_due_is_recalculated_from_base_and_rate(self):
 		entry = self.make_entry(120, 8.5, "445685", insert=False)

@@ -393,6 +393,9 @@ doc_events = {
 		"on_trash": "erpnext_france.utils.transaction_log.check_deletion_permission",
 		"on_submit": "erpnext_france.utils.transaction_log.create_transaction_log",
 	},
+	"Repost Accounting Ledger": {
+		"validate": "erpnext_france.utils.repost_accounting_ledger.validate_repost_accounting_ledger",
+	},
 	"GL Entry": {
 		"on_submit": "erpnext_france.utils.accounting_entry_number.add_accounting_entry_number",
 	},

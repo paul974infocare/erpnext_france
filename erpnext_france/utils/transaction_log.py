@@ -6,9 +6,12 @@ from erpnext import get_region
 from frappe import _
 
 
+TRANSACTION_LOG_SUPPORTED_REGIONS = frozenset({"France", "Guadeloupe", "Martinique", "Réunion"})
+
+
 def check_deletion_permission(doc, method):
 	region = get_region(doc.company)
-	if region in ["France"] and doc.docstatus != 0:
+	if region in TRANSACTION_LOG_SUPPORTED_REGIONS and doc.docstatus != 0:
 		frappe.throw(_("Deletion is not permitted for country {0}").format(region))
 
 
@@ -17,8 +20,8 @@ def create_transaction_log(doc, method):
 	Appends the transaction to a chain of hashed logs for legal resons.
 	Called on submit of Sales Invoice and Payment Entry.
 	"""
-	region = get_region()
-	if region != "France":
+	region = get_region(doc.company)
+	if region not in TRANSACTION_LOG_SUPPORTED_REGIONS:
 		return
 
 	data = str(doc.as_dict())

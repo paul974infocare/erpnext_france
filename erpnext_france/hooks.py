@@ -350,6 +350,8 @@ before_tests = "erpnext_france.tests.utils.before_tests"
 doc_events = {
 	"Purchase Invoice": {
 		"validate": "erpnext_france.controllers.item_account_gl.get_correct_default_account_validate",
+		"before_cancel": "erpnext_france.utils.accounting_entry_number.prepare_cancellation_accounting_entry_number",
+		"on_cancel": "erpnext_france.utils.accounting_entry_number.clear_cancellation_accounting_entry_number",
 		"on_submit": "erpnext_france.erpnext_france.purchase_invoice.purchase_invoice.correct_gl_entry_supplier_discount",
 		"before_save": [
 			"erpnext_france.controllers.supplier_item_no.before_save",
@@ -370,6 +372,8 @@ doc_events = {
 	},
 	"Sales Invoice": {
 		"on_trash": "erpnext_france.utils.transaction_log.check_deletion_permission",
+		"before_cancel": "erpnext_france.utils.accounting_entry_number.prepare_cancellation_accounting_entry_number",
+		"on_cancel": "erpnext_france.utils.accounting_entry_number.clear_cancellation_accounting_entry_number",
 		"on_submit": [
 			"erpnext_france.utils.transaction_log.create_transaction_log",
 		],
@@ -391,7 +395,13 @@ doc_events = {
 	},
 	"Payment Entry": {
 		"on_trash": "erpnext_france.utils.transaction_log.check_deletion_permission",
+		"before_cancel": "erpnext_france.utils.accounting_entry_number.prepare_cancellation_accounting_entry_number",
+		"on_cancel": "erpnext_france.utils.accounting_entry_number.clear_cancellation_accounting_entry_number",
 		"on_submit": "erpnext_france.utils.transaction_log.create_transaction_log",
+	},
+	"Journal Entry": {
+		"before_cancel": "erpnext_france.utils.accounting_entry_number.prepare_cancellation_accounting_entry_number",
+		"on_cancel": "erpnext_france.utils.accounting_entry_number.clear_cancellation_accounting_entry_number",
 	},
 	"Repost Accounting Ledger": {
 		"validate": "erpnext_france.utils.repost_accounting_ledger.validate_repost_accounting_ledger",
@@ -442,6 +452,13 @@ doc_events = {
 # }
 
 scheduler_events = {"daily_long": ["erpnext_france.tasks.check_sirene_update"]}
+
+before_job = [
+	"erpnext_france.utils.accounting_entry_number.prepare_repost_accounting_entry_numbers",
+]
+after_job = [
+	"erpnext_france.utils.accounting_entry_number.clear_repost_accounting_entry_numbers",
+]
 
 # Testing
 # -------

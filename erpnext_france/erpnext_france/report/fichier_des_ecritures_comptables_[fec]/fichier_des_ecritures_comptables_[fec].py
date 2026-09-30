@@ -182,6 +182,12 @@ def get_gl_entries(company, fiscal_year, from_date, to_date, hide_already_export
 	credit = frappe.query_builder.functions.Sum(gle.credit).as_("credit")
 	debit_currency = frappe.query_builder.functions.Sum(gle.debit_in_account_currency).as_("debitCurr")
 	credit_currency = frappe.query_builder.functions.Sum(gle.credit_in_account_currency).as_("creditCurr")
+	debit_transaction_currency = frappe.query_builder.functions.Sum(
+		gle.debit_in_transaction_currency
+	).as_("debitTransactionCurr")
+	credit_transaction_currency = frappe.query_builder.functions.Sum(
+		gle.credit_in_transaction_currency
+	).as_("creditTransactionCurr")
 
 	query = (
 		frappe.qb.from_(gle)
@@ -204,11 +210,14 @@ def get_gl_entries(company, fiscal_year, from_date, to_date, hide_already_export
 			gle.name.as_("GlName"),
 			gle.account,
 			gle.transaction_date,
+			gle.transaction_currency,
 			gle.export_date.as_("ExportDate"),
 			debit,
 			credit,
 			debit_currency,
 			credit_currency,
+			debit_transaction_currency,
+			credit_transaction_currency,
 			gle.accounting_entry_number,
 			gle.voucher_type,
 			gle.voucher_no,
@@ -227,6 +236,7 @@ def get_gl_entries(company, fiscal_year, from_date, to_date, hide_already_export
 			purchase_invoice.name.as_("PurName"),
 			purchase_invoice.title.as_("PurTitle"),
 			purchase_invoice.posting_date.as_("PurPostDate"),
+			purchase_invoice.bill_date.as_("PurBillDate"),
 			purchase_invoice.due_date.as_("PurDueDate"),
 			journal_entry.cheque_no.as_("JnlRef"),
 			journal_entry.posting_date.as_("JnlPostDate"),
@@ -252,17 +262,21 @@ def get_gl_entries(company, fiscal_year, from_date, to_date, hide_already_export
 	if hide_already_exported:
 		query = query.where(gle.export_date.isnull())
 
-	current_order = Order.desc
-	if company_doc.type_export_fec == "Standard FEC Export":
-		current_order = Order.asc
-
-	query = (
-		query.groupby(gle.voucher_type, gle.voucher_no, gle.account, gle.name, gle.accounting_entry_number)
-		.orderby(gle.posting_date, order=current_order)
-		.orderby(gle.voucher_no, gle.accounting_entry_number)
-	)
+	query = query.groupby(gle.voucher_type, gle.voucher_no, gle.account, gle.name, gle.accounting_entry_number)
+	query = get_fec_query_order(query, gle, company_doc.type_export_fec)
 
 	return query.run(as_dict=True)
+
+
+def get_fec_query_order(query, gle, type_export_fec):
+	if type_export_fec == "Standard FEC Export":
+		return query.orderby(gle.accounting_entry_number, order=Order.asc).orderby(gle.name, order=Order.asc)
+
+	return (
+		query.orderby(gle.posting_date, order=Order.desc)
+		.orderby(gle.voucher_no, order=Order.asc)
+		.orderby(gle.accounting_entry_number, order=Order.asc)
+	)
 
 
 def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
@@ -277,14 +291,10 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 		filters={"Company": company},
 		fields=["name", "account_number", "account_name"],
 	)
-	journals = {
-		j.journal_code: j.journal_name
-		for j in frappe.get_all("Accounting Journal", fields=["journal_code", "journal_name"])
-	}
-	party_data = [x for x in data if x.get("against_voucher")]
+	journals = get_accounting_journals(company)
 
 	for d in data:
-		JournalCode = d.get("accounting_journal") or re.split("-|/|[0-9]", d.get("voucher_no"))[0]
+		JournalCode, JournalLib = get_journal_values(d, journals)
 		EcritureNum = d.get("accounting_entry_number")
 		GlName = d.get("GlName")
 
@@ -301,6 +311,7 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 		]
 		if account_number:
 			original = account_number[0]["account_number"]
+			CompteLib = account_number[0]["account_name"]
 			# Apply zero-padding as suffix if configured
 			if account_code_length > 0 and len(original) < account_code_length:
 				CompteNum = original.ljust(account_code_length, "0")
@@ -368,7 +379,7 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 		if d.get("voucher_type") == "Purchase Invoice":
 			NumFacture = d.get("voucher_no")
 			DateLimitReglmt = format_datetime(d.get("PurDueDate"), "yyyyMMdd")
-			PieceDate = format_datetime(d.get("PurPostDate"), "yyyyMMdd")
+			PieceDate = format_datetime(d.get("PurBillDate") or d.get("PurPostDate"), "yyyyMMdd")
 
 		# EcritureLib is the reference title unless it is an opening entry
 		if d.get("is_opening") == "Yes":
@@ -395,32 +406,18 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 		if d.debit == d.credit == 0:
 			continue
 
-		Idevise = d.get("account_currency")
+		Montantdevise, Idevise = get_transaction_currency_values(d, company_currency)
 
-		DateLet = get_date_let(d, party_data) if d.get("against_voucher") else None
-		EcritureLet = d.get("against_voucher", "") if DateLet else ""
-
-		Montantdevise = None
-		if Idevise != company_currency:
-			Montantdevise = (
-				"{:.2f}".format(d.get("debitCurr")).replace(".", ",")
-				if d.get("debitCurr") != 0
-				else "{:.2f}".format(d.get("creditCurr")).replace(".", ",")
-			)
-		else:
-			Montantdevise = (
-				"{:.2f}".format(d.get("debit")).replace(".", ",")
-				if d.get("debit") != 0
-				else "{:.2f}".format(d.get("credit")).replace(".", ",")
-			)
+		EcritureLet = ""
+		DateLet = ""
 
 		row = [
 			JournalCode,
-			journals.get(JournalCode),
+			JournalLib,
 			EcritureNum,
 			EcritureDate,
 			CompteNum,
-			d.get("account"),
+			CompteLib,
 			CompAuxNum,
 			CompAuxLib,
 			PieceRef,
@@ -444,29 +441,35 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 	return result
 
 
-def get_date_let(d, data):
-	let_dates = [
-		x.get("GlPostDate")
-		for x in data
-		if (
-			x.get("against_voucher") == d.get("against_voucher")
-			and x.get("against_voucher_type") == d.get("against_voucher_type")
-			and x.get("party") == d.get("party")
-		)
-	]
+def get_accounting_journals(company):
+	journals = frappe.get_all(
+		"Accounting Journal",
+		filters={"company": company},
+		fields=["name", "journal_code", "journal_name"],
+	)
+	return {
+		"by_name": {
+			journal["name"]: (journal["journal_code"], journal["journal_name"]) for journal in journals
+		},
+		"by_code": {journal["journal_code"]: journal["journal_name"] for journal in journals},
+	}
 
-	if not let_dates or len(let_dates) == 1:
-		let_vouchers = frappe.get_all(
-			"GL Entry",
-			filters={
-				"against_voucher": d.get("against_voucher"),
-				"against_voucher_type": d.get("against_voucher_type"),
-				"party": d.get("party"),
-			},
-			fields=["posting_date"],
-		)
 
-		if len(let_vouchers) > 1:
-			return format_datetime(max([x.get("posting_date") for x in let_vouchers]), "yyyyMMdd")
+def get_journal_values(entry, journals):
+	accounting_journal = entry.get("accounting_journal")
+	if accounting_journal:
+		return journals["by_name"].get(accounting_journal, ("", ""))
 
-	return format_datetime(max(let_dates), "yyyyMMdd") if len(let_dates) > 1 else None
+	journal_code = re.split("-|/|[0-9]", entry.get("voucher_no"))[0]
+	return journal_code, journals["by_code"].get(journal_code)
+
+
+def get_transaction_currency_values(entry, company_currency):
+	transaction_currency = entry.get("transaction_currency")
+	if not transaction_currency or transaction_currency == company_currency:
+		return "", ""
+
+	debit = entry.get("debitTransactionCurr") or 0
+	credit = entry.get("creditTransactionCurr") or 0
+	amount = debit if debit != 0 else -credit
+	return "{:.2f}".format(amount).replace(".", ","), transaction_currency

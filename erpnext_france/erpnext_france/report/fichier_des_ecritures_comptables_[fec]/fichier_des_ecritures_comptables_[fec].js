@@ -76,15 +76,15 @@ let fec_export = function (query_report, mark_exported) {
   const fiscal_year = query_report.get_values().fiscal_year;
   const company = query_report.get_values().company;
   frappe.db.get_value("Company", company, "siret", (value) => {
-    const company_data = value.siret;
-    if (company_data === null || company_data === undefined) {
+    const siren = get_siren_from_siret(value && value.siret);
+    if (!siren) {
       frappe.msgprint(
         __("Please register the SIRET number in the company information file")
       );
     } else {
       frappe.db.get_value("Fiscal Year", fiscal_year, "year_end_date", (r) => {
         const fy = r.year_end_date;
-        const title = company_data + "FEC" + moment(fy).format("YYYYMMDD");
+        const title = siren + "FEC" + moment(fy).format("YYYYMMDD");
         // Remove unwanted columns in CSV Export
         const column_row = query_report.columns
           .filter((col) => !["ExportDate", "GlName"].includes(col.fieldname))
@@ -141,13 +141,22 @@ let downloadify = function (data, roles, title) {
   document.body.removeChild(a);
 };
 
-let to_tab_csv = function (data) {
+function get_siren_from_siret(siret) {
+  if (typeof siret !== "string") {
+    return null;
+  }
+
+  const normalized_siret = siret.replace(/\s/g, "");
+  return /^\d{14}$/.test(normalized_siret) ? normalized_siret.slice(0, 9) : null;
+}
+
+function to_tab_csv(data) {
   let res = [];
   $.each(data, function (i, row) {
-    res.push(row.join(";"));
+    res.push(row.join("\t"));
   });
   return res.join("\n");
-};
+}
 
 function mark_as_exported(gl_entries) {
   frappe.call({

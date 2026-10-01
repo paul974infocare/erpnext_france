@@ -398,7 +398,7 @@ def get_result(company, fiscal_year, from_date, to_date, hide_already_exported):
 		else:
 			EcritureLib = d.get("voucher_type")
 
-		EcritureLib = " ".join((EcritureLib or "").splitlines())
+		EcritureLib = " ".join((EcritureLib or "").splitlines()) or d.get("voucher_type")
 
 		debit = "{:.2f}".format(d.get("debit")).replace(".", ",")
 

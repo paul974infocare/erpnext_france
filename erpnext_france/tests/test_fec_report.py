@@ -55,6 +55,12 @@ class TestFECReport(unittest.TestCase):
 
 		self.assertEqual(result[0][9], "20260203")
 
+	def test_purchase_invoice_without_title_falls_back_to_voucher_type(self):
+		result = self.get_purchase_invoice_result(None)
+
+		self.assertEqual(result[0][10], "Purchase Invoice")
+		self.assertTrue(result[0][10])
+
 	def test_lettrage_fields_stay_empty_with_against_voucher(self):
 		result = self.get_purchase_invoice_result(None, against_voucher="SI-0001")
 

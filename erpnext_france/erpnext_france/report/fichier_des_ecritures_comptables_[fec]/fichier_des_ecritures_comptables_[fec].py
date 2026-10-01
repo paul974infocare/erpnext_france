@@ -209,6 +209,7 @@ def get_gl_entries(company, fiscal_year, from_date, to_date, hide_already_export
 			gle.posting_date.as_("GlPostDate"),
 			gle.name.as_("GlName"),
 			gle.account,
+			gle.is_opening,
 			gle.transaction_date,
 			gle.transaction_currency,
 			gle.export_date.as_("ExportDate"),

@@ -13,7 +13,7 @@ fec_report = importlib.import_module(
 
 
 class TestFECReport(unittest.TestCase):
-	def get_purchase_invoice_result(self, bill_date, against_voucher=None):
+	def get_purchase_invoice_result(self, bill_date, against_voucher=None, is_opening=None):
 		account = frappe._dict(
 			{
 				"name": "706 - Prestations de services - TEST",
@@ -32,6 +32,7 @@ class TestFECReport(unittest.TestCase):
 				"PurPostDate": "2026-02-03",
 				"PurBillDate": bill_date,
 				"against_voucher": against_voucher,
+				"is_opening": is_opening,
 			}
 		)
 
@@ -58,6 +59,11 @@ class TestFECReport(unittest.TestCase):
 		result = self.get_purchase_invoice_result(None, against_voucher="SI-0001")
 
 		self.assertEqual(result[0][13:15], ["", ""])
+
+	def test_opening_entry_uses_opening_entry_journal_as_entry_label(self):
+		result = self.get_purchase_invoice_result(None, is_opening="Yes")
+
+		self.assertEqual(result[0][10], "Opening Entry Journal")
 
 	@patch.object(fec_report, "format_datetime", return_value="20260101")
 	@patch.object(fec_report, "get_accounting_journals", return_value={"by_name": {}, "by_code": {}})

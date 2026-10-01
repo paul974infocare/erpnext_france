@@ -18,19 +18,32 @@ frappe.query_reports["Fichier des Ecritures Comptables [FEC]"] = {
       options: "Fiscal Year",
       default: erpnext.utils.get_fiscal_year(frappe.datetime.get_today()),
       reqd: 1,
+      on_change: function (query_report) {
+        const fiscal_year = query_report.get_values().fiscal_year;
+        if (!fiscal_year) {
+          return;
+        }
+        frappe.model.with_doc("Fiscal Year", fiscal_year, function () {
+          const fy = frappe.model.get_doc("Fiscal Year", fiscal_year);
+          frappe.query_report.set_filter_value({
+            from_date: fy.year_start_date,
+            to_date: fy.year_end_date,
+          });
+        });
+      },
     },
     {
       fieldname: "from_date",
       label: __("From Date"),
       fieldtype: "Date",
-      default: frappe.datetime.add_months(frappe.datetime.get_today(), -1),
+      default: erpnext.utils.get_fiscal_year(frappe.datetime.get_today(), true)[1],
       reqd: 0,
     },
     {
       fieldname: "to_date",
       label: __("To Date"),
       fieldtype: "Date",
-      default: frappe.datetime.get_today(),
+      default: erpnext.utils.get_fiscal_year(frappe.datetime.get_today(), true)[2],
       reqd: 0,
     },
     {
@@ -73,8 +86,9 @@ frappe.query_reports["Fichier des Ecritures Comptables [FEC]"] = {
 };
 
 let fec_export = function (query_report, mark_exported) {
-  const fiscal_year = query_report.get_values().fiscal_year;
-  const company = query_report.get_values().company;
+  const filters = query_report.get_values();
+  const fiscal_year = filters.fiscal_year;
+  const company = filters.company;
   frappe.db.get_value("Company", company, "siret", (value) => {
     const siren = get_siren_from_siret(value && value.siret);
     if (!siren) {
@@ -82,27 +96,47 @@ let fec_export = function (query_report, mark_exported) {
         __("Please register the SIRET number in the company information file")
       );
     } else {
-      frappe.db.get_value("Fiscal Year", fiscal_year, "year_end_date", (r) => {
-        const fy = r.year_end_date;
-        const title = siren + "FEC" + moment(fy).format("YYYYMMDD");
-        // Remove unwanted columns in CSV Export
-        const column_row = query_report.columns
-          .filter((col) => !["ExportDate", "GlName"].includes(col.fieldname))
-          .map((col) => col.fieldname);
-        const column_data = query_report.get_data_for_csv(false);
+      frappe.db.get_value(
+        "Fiscal Year",
+        fiscal_year,
+        ["year_start_date", "year_end_date"],
+        (r) => {
+          const export_fec = () => {
+            const title = siren + "FEC" + moment(r.year_end_date).format("YYYYMMDD");
+            // Remove unwanted columns in CSV Export
+            const column_row = query_report.columns
+              .filter((col) => !["ExportDate", "GlName"].includes(col.fieldname))
+              .map((col) => col.fieldname);
+            const column_data = query_report.get_data_for_csv(false);
 
-        let gl_entries = [];
-        column_data.forEach((data) => {
-          gl_entries.push([data.pop(), data.pop()]);
-        });
+            let gl_entries = [];
+            column_data.forEach((data) => {
+              gl_entries.push([data.pop(), data.pop()]);
+            });
 
-        const result = [column_row].concat(column_data);
-        downloadify(result, null, title);
+            const result = [column_row].concat(column_data);
+            downloadify(result, null, title);
 
-        if (mark_exported) {
-          mark_as_exported(gl_entries);
+            if (mark_exported) {
+              mark_as_exported(gl_entries);
+            }
+          };
+
+          if (
+            filters.from_date !== r.year_start_date ||
+            filters.to_date !== r.year_end_date
+          ) {
+            frappe.msgprint(
+              __(
+                "The physical FEC export currently requires the complete period of the selected Fiscal Year."
+              )
+            );
+            return;
+          }
+
+          export_fec();
         }
-      });
+      );
     }
   });
 };

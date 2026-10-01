@@ -84,67 +84,6 @@ function get_payment_terms_before_invoice(
   });
 }
 
-display_dialog_create_down_payment_item = function (frm, company) {
-  let d = new frappe.ui.Dialog({
-    title: "Enter details",
-    fields: [
-      {
-        label: __("Item Group"),
-        fieldname: "item_group",
-        fieldtype: "Link",
-        options: "Item Group",
-        reqd: 1,
-      },
-      {
-        label: __("Income Account"),
-        fieldname: "income_account",
-        fieldtype: "Link",
-        options: "Account",
-        get_query() {
-          return {
-            query: "erpnext.controllers.queries.get_income_account",
-            filters: { company: company },
-          };
-        },
-        reqd: 1,
-      },
-      {
-        label: __("Expense Account"),
-        fieldname: "expense_account",
-        fieldtype: "Link",
-        options: "Account",
-        get_query() {
-          return {
-            query: "erpnext.controllers.queries.get_expense_account",
-            filters: { company: company },
-          };
-        },
-      },
-    ],
-    size: "small", // small, large, extra-large
-    primary_action_label: "Submit",
-    primary_action(values) {
-      frm.call({
-        method:
-          "erpnext_france.utils.create_down_payment_item.create_down_payment_item",
-        args: {
-          company: company,
-          item_group: values.item_group,
-          income_account: values.income_account,
-          expense_account: values.expense_account,
-        },
-        freeze: true,
-        callback: function () {
-          frappe.msgprint(__("Down Payment Item Successfully created"));
-        },
-      });
-      d.hide();
-    },
-  });
-
-  d.show();
-};
-
 frappe.update_doc_with_sirene_info = async function (doc, entity, doctype) {
   const baseFields = {};
   const addressFields = {};

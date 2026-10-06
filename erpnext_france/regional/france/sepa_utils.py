@@ -292,6 +292,24 @@ def reconcile_bank_transaction_to_sepa_line(bank_transaction, end_to_end_id):
 	# Get bank transaction
 	bank_txn = frappe.get_doc("Bank Transaction", bank_transaction)
 
+	# Automatic SEPA reconciliation is only safe for an exact amount match.
+	# Amount discrepancies must remain available for manual bank reconciliation.
+	if flt(bank_txn.unallocated_amount, 2) != flt(sepa_line.amount, 2):
+		frappe.throw(
+			_("Bank Transaction amount {0} does not match SEPA payment amount {1}.").format(
+				flt(bank_txn.unallocated_amount, 2),
+				flt(sepa_line.amount, 2),
+			)
+		)
+
+	# The bank movement direction must match the SEPA payment direction:
+	# Pay (Credit / pain.001) is a withdrawal; Receive (Debit / pain.008) is a deposit.
+	payment_type = get_sepa_payment_type(bordereau)
+	if payment_type == "Pay" and flt(bank_txn.withdrawal) <= 0:
+		frappe.throw(_("Outgoing SEPA payments can only be reconciled with bank withdrawals."))
+	if payment_type == "Receive" and flt(bank_txn.deposit) <= 0:
+		frappe.throw(_("Incoming SEPA payments can only be reconciled with bank deposits."))
+
 	# Get GL Account from Bank Account
 	gl_account = frappe.db.get_value("Bank Account", bordereau.bank_account, "account")
 	if not gl_account:
@@ -369,6 +387,26 @@ def reconcile_bank_transaction_to_sepa_line(bank_transaction, end_to_end_id):
 	payment_entry.insert()
 	payment_entry.submit()
 
+	# Reconcile the created Payment Entry with the Bank Transaction
+	# through ERPNext's native bank reconciliation mechanism.
+	from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import (
+		reconcile_vouchers,
+	)
+
+	reconcile_vouchers(
+		bank_txn.name,
+		frappe.as_json(
+			[
+				{
+					"payment_doctype": "Payment Entry",
+					"payment_name": payment_entry.name,
+					"amount": abs(bank_txn.unallocated_amount),
+				}
+			]
+		),
+		is_new_voucher=True,
+	)
+
 	# Update SEPA line status
 	frappe.db.set_value("SEPA Payment Bordereau Line", sepa_line.name, "status", "Accepted")
 	sync_invoice_sepa_bordereau_link(
@@ -415,11 +453,16 @@ def auto_reconcile_sepa_transaction(doc, method):
 		)
 
 		if sepa_line:
+			savepoint = f"sepa_auto_reconcile_{sepa_line}"
+			frappe.db.savepoint(savepoint)
 			try:
 				reconcile_bank_transaction_to_sepa_line(doc.name, end_to_end_id)
 				# If successful, we can stop searching for this transaction
 				break
 			except Exception:
+				# Keep Bank Transaction submission non-blocking while rolling back
+				# every change made by the failed SEPA reconciliation attempt.
+				frappe.db.rollback(save_point=savepoint)
 				frappe.log_error(frappe.get_traceback(), _("SEPA Auto-Reconciliation Error"))
 
 

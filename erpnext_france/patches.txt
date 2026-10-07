@@ -8,5 +8,6 @@ erpnext_france.patches.v15_0.sync_sales_invoice_sepa_bordereau
 erpnext_france.patches.v15_0.migrate_incoterm
 erpnext_france.patches.v15_0.migrate_categorie_comptable_tiers
 erpnext_france.patches.v16_0.create_advance_vat_account
+erpnext_france.patches.v16_0.move_vat_due_accounts_to_liability
 erpnext_france.patches.v16_0.remove_legacy_down_payment_metadata
 erpnext_france.patches.v16_0.enable_french_accounting_settings

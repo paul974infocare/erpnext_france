@@ -34,6 +34,12 @@ class TestChartOfAccounts(unittest.TestCase):
 
 		account_4091 = find_account(chart["tree"], "4091")
 		account_4191 = find_account(chart["tree"], "4191")
+		account_4452 = find_account(chart["tree"], "4452")
+		account_4453 = find_account(chart["tree"], "4453")
+		account_445621 = find_account(chart["tree"], "445621")
+		account_445685 = find_account(chart["tree"], "445685")
+		account_445721 = find_account(chart["tree"], "445721")
+		account_445785 = find_account(chart["tree"], "445785")
 		account_44588 = find_account(chart["tree"], "44588")
 
 		self.assertEqual(
@@ -43,6 +49,30 @@ class TestChartOfAccounts(unittest.TestCase):
 		self.assertEqual(
 			account_4191,
 			{"account_number": "4191", "account_type": "Receivable", "root_type": "Liability"},
+		)
+		self.assertEqual(
+			account_4452,
+			{"account_number": "4452", "account_type": "Tax", "tax_rate": -20, "root_type": "Liability"},
+		)
+		self.assertEqual(
+			account_4453,
+			{"account_number": "4453", "account_type": "Tax", "root_type": "Liability"},
+		)
+		self.assertEqual(
+			account_445621,
+			{"account_number": "445621", "account_type": "Tax", "tax_rate": 2.1, "root_type": "Asset"},
+		)
+		self.assertEqual(
+			account_445685,
+			{"account_number": "445685", "account_type": "Tax", "tax_rate": 8.5, "root_type": "Asset"},
+		)
+		self.assertEqual(
+			account_445721,
+			{"account_number": "445721", "account_type": "Tax", "tax_rate": 2.1, "root_type": "Liability"},
+		)
+		self.assertEqual(
+			account_445785,
+			{"account_number": "445785", "account_type": "Tax", "tax_rate": 8.5, "root_type": "Liability"},
 		)
 		self.assertEqual(
 			account_44588,

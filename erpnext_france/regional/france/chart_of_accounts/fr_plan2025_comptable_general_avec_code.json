@@ -897,15 +897,6 @@
 					"account_number": "441"
 				},
 				"445-\u00c9tat - Taxes sur le chiffre d'affaires": {
-					"TVA due intracommunautaire": {
-						"account_number": "4452",
-						"account_type": "Tax",
-						"tax_rate": -20
-					},
-					"TVA due à l'importation": {
-						"account_number": "4453",
-						"account_type": "Tax"
-					},
 					"TVA \u00e0 d\u00e9caisser": {
 						"account_number": "44551"
 					},
@@ -1202,6 +1193,15 @@
 					"account_number": "444"
 				},
 				"445-\u00c9tat - Taxes sur le chiffre d'affaires": {
+					"TVA due intracommunautaire": {
+						"account_number": "4452",
+						"account_type": "Tax",
+						"tax_rate": -20
+					},
+					"TVA due à l'importation": {
+						"account_number": "4453",
+						"account_type": "Tax"
+					},
 					"4455-Taxes sur le chiffre d'affaires \u00e0 d\u00e9caisser": {
 						"Taxes assimil\u00e9es \u00e0 la TVA": {
 							"account_number": "44558"

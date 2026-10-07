@@ -107,8 +107,41 @@ def setup_company_default(company, action):
     )
     company.create_default_warehouses()
     set_default_accounting_journal(company.company_name, company.abbr)
+    configure_french_company_defaults(company)
 
     frappe.local.flags.ignore_chart_of_accounts = True
+
+
+def configure_french_company_defaults(company):
+	if company.country not in SUPPORTED_ACCOUNTING_COUNTRIES:
+		return
+
+	income_account = frappe.db.get_value(
+		"Account",
+		{
+			"account_number": "706",
+			"company": company.name,
+			"is_group": 0,
+		},
+		"name",
+	)
+	if not income_account or not frappe.db.exists("Item Group", "Services"):
+		return
+
+	item_group = frappe.get_doc("Item Group", "Services")
+	if any(
+		item_default.company == company.name for item_default in item_group.item_group_defaults or []
+	):
+		return
+
+	item_group.append(
+		"item_group_defaults",
+		{
+			"company": company.name,
+			"income_account": income_account,
+		},
+	)
+	item_group.save(ignore_permissions=True)
 
 
 def set_french_accounting_settings():
